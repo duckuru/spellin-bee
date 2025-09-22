@@ -154,3 +154,17 @@ export const updateProfile = async () => {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
+
+export const checkAuth = async (req, res) => {
+  try {
+    // const userData = await UserData.findOne({ userId: req.user._id });
+
+    const response = await formatUserResponse(req.user);
+    res.status(200).json({
+      response
+    });
+  } catch (error) {
+    console.error("Error in /check:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}

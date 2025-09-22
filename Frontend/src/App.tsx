@@ -1,35 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Navigate, Route, Routes, useNavigate } from 'react-router'
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import MainPage from './pages/MainPage';
+import GuestPage from './pages/GuestPage';
+import HexagonBackground from './components/background/Hexagon';
+import { useEffect, useMemo } from 'react';
+import { useAuthStore } from './store/useAuthStore';
+import PageLoader from './components/PageLoader';
+import { Toaster } from 'react-hot-toast';
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const colors = useMemo(() => ["#795a3e", "#fddb59", "#ffc105", "#f3f3f3", "#3f3f3f",], []);
+
+  const {checkAuth, isCheckingAuth, authUser} = useAuthStore();
+
+  useEffect(() => {
+    checkAuth()
+  },[checkAuth])
+
+  console.log({authUser})
+
+  if(isCheckingAuth) return <PageLoader/>
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen overflow-hidden flex flex-col bg-gradient-to-b from-[#ffe397] to-[#f3f3f3] quicksand-bold">
+      <HexagonBackground colorsProp={colors} />
+      <div className="absolute top-[2rem] w-full flex items-center justify-between px-[3rem] sm:px-6 md:px-12 z-20">
+        <div className="flex items-center justify-center flex-1 gap-4">
+          <img src="logoSB.png" alt="Logo" className="w-32 h-32" />
+          <h1 className="text-[6.5rem] text-[#FFC105] sour-gummy-bold">
+            <span className="text-[#FFC105]">SPELLIN</span>
+            <span className="text-[#795a3e]">-BEE</span>
+          </h1>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <Routes>
+        <Route
+          path="/"
+          element={!authUser ? <GuestPage /> : <Navigate to={"/main"} />}
+        ></Route>
+        <Route
+          path="/main"
+          element={authUser ? <MainPage /> : <Navigate to={"/login"} />}
+        ></Route>
+        <Route
+          path="/login"
+          element={!authUser ? <LoginPage /> : <Navigate to={"/main"} />}
+        ></Route>
+        <Route
+          path="/signup"
+          element={!authUser ? <SignupPage /> : <Navigate to={"/main"} />}
+        ></Route>
+      </Routes>
+
+      <Toaster />
+    </div>
+  );
 }
 
 export default App
