@@ -2,69 +2,85 @@ import User from "../models/User.js";
 import UserData from "../models/Userdata.js";
 import { generateToken } from "../lib/utils.js";
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
 
 export const signup = async (req, res) => {
-  const {username, email, password} = req.body
-  
+  const { username, email, password } = req.body;
+
+  // 🔹 Start a MongoDB session for transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    // 1️⃣ Input validation
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     if (password.length < 6) {
-     return res.status(400).json({ message: "Password must be at least 6 characters" });
-    } 
-
-    //email regex check
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!emailRegex.test(email)){
-      return res.status(400).json({ message: "Invalid Email format" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
     }
 
-    const userEmail = await User.findOne({email});
-    if(userEmail) return res.status(400).json({ message: "Email already exist" });
-    const userUsername = await User.findOne({username});
-    if (userUsername) return res.status(400).json({ message: "Username already exist" });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
 
+    // 2️⃣ Check for duplicates
+    const userEmail = await User.findOne({ email }).session(session);
+    if (userEmail)
+      return res.status(400).json({ message: "Email already exists" });
+
+    const userUsername = await User.findOne({ username }).session(session);
+    if (userUsername)
+      return res.status(400).json({ message: "Username already exists" });
+
+    // 3️⃣ Hash password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password,salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword
+    // 4️⃣ Create User + UserData inside the same transaction
+    const newUserArr = await User.create(
+      [{ username, email, password: hashedPassword }],
+      { session }
+    );
+    const userDoc = newUserArr[0];
+
+    const newUserDataArr = await UserData.create([{ userId: userDoc._id }], {
+      session,
     });
+    const newUserData = newUserDataArr[0];
 
-    await newUser.save();
+    // 5️⃣ If both succeed, commit transaction
+    if (userDoc && newUserData) {
+      await session.commitTransaction();
+      session.endSession();
 
-    const newUserData = new UserData({
-      userId: newUser._id, // link to User
-      // rank, mmr, level will use defaults
-    });
+      // Generate JWT and set cookie
+      generateToken(userDoc._id, res);
 
-    await newUserData.save();
-
-    if(newUser){
-      generateToken(newUser._id, res)
-
-      res.status(201).json({
-        _id: newUser.id,
-        username: newUser.username,
-        email: newUser.email,
-        profilePic: newUser.profilePic,
+      return res.status(201).json({
+        _id: userDoc._id,
+        username: userDoc.username,
+        email: userDoc.email,
+        profilePic: userDoc.profilePic,
         userData: {
           rank: newUserData.rank,
           mmr: newUserData.mmr,
           level: newUserData.level,
         },
       });
-
-    }else{
-      return res.status(400).json({ message: "Invalid User data" });
+    } else {
+      throw new Error("User creation failed");
     }
-
   } catch (error) {
-    console.log("Error in signup controller:", error);
-    res.status(500).json({message: "Internal Server error"});
+    // ❌ Rollback if anything fails
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error("Error in signup controller:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
