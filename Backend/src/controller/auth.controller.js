@@ -3,6 +3,7 @@ import UserData from "../models/Userdata.js";
 import { generateToken } from "../lib/utils.js";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
+import { formatUserResponse } from "../utils/userResponse.js";
 
 export const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -53,25 +54,29 @@ export const signup = async (req, res) => {
     });
     const newUserData = newUserDataArr[0];
 
+    
     // 5️⃣ If both succeed, commit transaction
     if (userDoc && newUserData) {
       await session.commitTransaction();
       session.endSession();
-
+      
       // Generate JWT and set cookie
       generateToken(userDoc._id, res);
+      const response = await formatUserResponse(userDoc);
 
-      return res.status(201).json({
-        _id: userDoc._id,
-        username: userDoc.username,
-        email: userDoc.email,
-        profilePic: userDoc.profilePic,
-        userData: {
-          rank: newUserData.rank,
-          mmr: newUserData.mmr,
-          level: newUserData.level,
-        },
-      });
+
+      return res.status(200).json(response);
+      // return res.status(200).json({
+      //   _id: userDoc._id,
+      //   username: userDoc.username,
+      //   email: userDoc.email,
+      //   profilePic: userDoc.profilePic,
+      //   userData: {
+      //     rank: newUserData.rank,
+      //     mmr: newUserData.mmr,
+      //     level: newUserData.level,
+      //   },
+      // });
     } else {
       throw new Error("User creation failed");
     }
@@ -84,3 +89,44 @@ export const signup = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
+export const login = async (req, res) => {
+  const {email, password} = req.body;
+
+  try{
+    const user = await User.findOne({email})
+    if(!user) return res.status(400).json({message: "Invalid Credentials"});
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password)
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: "Invalid Credentials" });
+
+    generateToken(user._id, res)
+
+    const response = await formatUserResponse(user);
+
+    return res.status(200).json(response);
+
+    // return res.status(200).json({
+    //   _id: user._id,
+    //   username: user.username,
+    //   email: user.email,
+    //   profilePic: user.profilePic,
+    //   userData: {
+    //     rank: userData?.rank,
+    //     mmr: userData?.mmr,
+    //     level: userData?.level,
+    //   },
+    // });
+
+  }catch(error){
+    console.log("Error in login controller:", error);
+    res.status(500).json({message: "Internal server error"});
+  }
+}
+
+export const logout = (_, res) => {
+  res.cookie("jwt", "", {maxAge: 0});
+  res.status(200).json({ message: "Logout Successfully" });
+}
