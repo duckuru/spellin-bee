@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { UserIcon, LogOutIcon } from "lucide-react";
+import MainContent from "../components/content/MainContent";
 
 function MainPage() {
   const { authUser, logout } = useAuthStore();
@@ -24,10 +25,10 @@ function MainPage() {
   if (!authUser) return null;
 
   return (
-    <div className="z-20">
+    <div className="relative w-full min-h-screen overflow-hidden">
+      {/* Top-right dropdown */}
       <div className="flex justify-end absolute z-50 right-20 top-[4.6rem] items-center gap-2">
         <div className="relative" ref={dropdownRef}>
-          {/* Username + Avatar Button */}
           <button
             className={`flex items-center gap-4 p-3 rounded-xl border-2 transition-colors text-3xl font-bold quicksand-bold bg-transparent text-[#3f3f3f] shadow-none ${
               dropdownOpen
@@ -49,7 +50,6 @@ function MainPage() {
             </div>
           </button>
 
-          {/* Dropdown Menu */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-44 bg-transparent border-2 border-[#795a3e] rounded-xl shadow-lg overflow-hidden z-50">
               <button
@@ -69,6 +69,11 @@ function MainPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* MainContent centered */}
+      <div className="w-full min-h-screen flex items-center justify-center z-50 top-[30rem]">
+        <MainContent />
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import PageLoader from './components/PageLoader';
 import { Toaster } from 'react-hot-toast';
+import CreateLobbyPage from './pages/CreateLobbyPage';
 
 
 function App() {
@@ -52,6 +53,10 @@ function App() {
         <Route
           path="/signup"
           element={!authUser ? <SignupPage /> : <Navigate to={"/main"} />}
+        ></Route>
+        <Route
+          path="/create-lobby"
+          element={authUser ? <CreateLobbyPage /> : <Navigate to={"/login"} />}
         ></Route>
       </Routes>
 
