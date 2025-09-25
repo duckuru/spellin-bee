@@ -9,6 +9,7 @@ import { useAuthStore } from './store/useAuthStore';
 import PageLoader from './components/PageLoader';
 import { Toaster } from 'react-hot-toast';
 import CreateLobbyPage from './pages/CreateLobbyPage';
+import GamePage from './pages/game/[room_id]';
 
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
       <HexagonBackground colorsProp={colors} />
       <div className="absolute top-[2rem] w-full flex items-center justify-between px-[3rem] sm:px-6 md:px-12 z-20">
         <div className="flex items-center justify-center flex-1 gap-4">
-          <img src="logoSB.png" alt="Logo" className="w-32 h-32" />
+          <img src="/logoSB.png" alt="Spelling Bee" className="w-32 h-32" />
           <h1 className="text-[6.5rem] text-[#FFC105] sour-gummy-bold">
             <span className="text-[#FFC105]">SPELLIN</span>
             <span className="text-[#795a3e]">-BEE</span>
@@ -58,6 +59,10 @@ function App() {
         <Route
           path="/create-lobby"
           element={authUser ? <CreateLobbyPage /> : <Navigate to={"/login"} />}
+        ></Route>
+        <Route
+          path="/game/:room_id"
+          element={authUser ? <GamePage /> : <Navigate to={"/login"} />}
         ></Route>
       </Routes>
 

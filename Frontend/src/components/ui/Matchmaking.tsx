@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useMatchmakingStore } from "../../store/useMatchmakingStore";
 
 interface MatchmakeProps {
   stopMatchmaking: () => void;
 }
 
-export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
+export default function Matchmaking() {
   const matchmake = [
     "Matchmaking",
     "Matchmaking.",
@@ -14,6 +15,7 @@ export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
     "Matchmaking...",
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { leaveQueue, queuePlayers, currentQueueLength } = useMatchmakingStore();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,11 +25,11 @@ export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
     return () => clearInterval(interval);
   }, [matchmake.length]);
 
-  const handleLeaveQueue = () => {
-    // socket.emit("leaveQueue");
-    stopMatchmaking(); // hide the Matchmake component
-    console.log("Left the matchmaking queue");
-  };
+  // const handleLeaveQueue = () => {
+  //   // socket.emit("leaveQueue");
+  //   stopMatchmaking(); // hide the Matchmake component
+  //   console.log("Left the matchmaking queue");
+  // };
 
   return (
     <div className="flex flex-row items-center justify-center gap-4 z-50">
@@ -44,7 +46,7 @@ export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
 
       {/* Leave queue button */}
       <button
-        onClick={handleLeaveQueue}
+        onClick={leaveQueue}
         className="bg-[#f3f3f3] opacity-80 hover:opacity-100 hover:bg-[#f3f3f3] 
                    shadow-md border-2 border-[#795a3e] rounded-lg h-[5.625rem] w-[5.625rem]"
       >
@@ -54,6 +56,9 @@ export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
           className="text-[3rem]"
         />
       </button>
+      <p className="text-[3rem] quicksand-semi text-[#795A3E] text-center w-full absolute top-20">
+        {currentQueueLength} /3
+      </p>
     </div>
   );
 }
