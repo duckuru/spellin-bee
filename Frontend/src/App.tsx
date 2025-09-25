@@ -14,13 +14,14 @@ import CreateLobbyPage from './pages/CreateLobbyPage';
 function App() {
   const colors = useMemo(() => ["#795a3e", "#fddb59", "#ffc105", "#f3f3f3", "#3f3f3f",], []);
 
-  const {checkAuth, isCheckingAuth, authUser} = useAuthStore();
+  const {checkAuth, isCheckingAuth, authUser , onlineUsers} = useAuthStore();
 
   useEffect(() => {
     checkAuth()
   },[checkAuth])
 
   console.log({authUser})
+  console.log({onlineUsers})
 
   if(isCheckingAuth) return <PageLoader/>
 

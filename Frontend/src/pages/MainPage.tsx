@@ -27,7 +27,7 @@ function MainPage() {
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
       {/* Top-right dropdown */}
-      <div className="flex justify-end absolute z-50 right-20 top-[4.6rem] items-center gap-2">
+      <div className="flex justify-end absolute z-60 right-20 top-[4.6rem] items-center gap-2">
         <div className="relative" ref={dropdownRef}>
           <button
             className={`flex items-center gap-4 p-3 rounded-xl border-2 transition-colors text-3xl font-bold quicksand-bold bg-transparent text-[#3f3f3f] shadow-none ${
@@ -38,7 +38,7 @@ function MainPage() {
             onClick={() => setDropdownOpen(!dropdownOpen)}
           >
             <span>{authUser.username}</span>
-            <div className="w-12 h-12 rounded-full overflow-hidden">
+            <div className="w-12 h-12 rounded-full overflow-hidden relative">
               <img
                 src={
                   authUser.profilePic ||
@@ -48,6 +48,11 @@ function MainPage() {
                 className="w-full h-full object-cover"
               />
             </div>
+            <span
+              className={`absolute top-3 right-4 w-3 h-3 rounded-full border-2 border-white ${
+                authUser ? "bg-green-500" : "bg-gray-400"
+              }`}
+            ></span>
           </button>
 
           {dropdownOpen && (
@@ -72,7 +77,7 @@ function MainPage() {
       </div>
 
       {/* MainContent centered */}
-      <div className="w-full min-h-screen flex items-center justify-center z-50 top-[30rem]">
+      <div className="w-full min-h-screen flex items-center justify-center z-50">
         <MainContent />
       </div>
     </div>
