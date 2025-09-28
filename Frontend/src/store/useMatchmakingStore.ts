@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useAuthStore } from "./useAuthStore";
+import toast from "react-hot-toast";
 
 interface MatchmakingState {
   inQueue: boolean;
@@ -34,10 +35,22 @@ export const useMatchmakingStore = create<MatchmakingState>((set, get) => ({
       set({ currentQueueLength: players.length });
     });
 
-    socket.on("gameFound", ({ room_id, players }) => {
-      console.log("Game found!", room_id, players);
-      // redirect user to /game/roomId
-      window.location.href = `/game/${room_id}`;
+    socket.on("gameFound", ({ room_id }) => {
+      let countdown = 5;
+      const toastId = toast.loading(`Game found! Starting in ${countdown}s...`);
+
+      const interval = setInterval(() => {
+        countdown -= 1;
+        if (countdown > 0) {
+          toast.loading(`Game found! Starting in ${countdown}s...`, {
+            id: toastId,
+          });
+        } else {
+          clearInterval(interval);
+          toast.success("Game starting now!", { id: toastId });
+          window.location.href = `/game/${room_id}`;
+        }
+      }, 1000);
     });
 
 

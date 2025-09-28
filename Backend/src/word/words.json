@@ -1,0 +1,38 @@
+{
+  "easy": [
+    "apple",
+    "book",
+    "cat",
+    "dog",
+    "egg",
+    "fish",
+    "goat",
+    "hat",
+    "ice",
+    "juice"
+  ],
+  "medium": [
+    "banana",
+    "camera",
+    "dolphin",
+    "elephant",
+    "flower",
+    "guitar",
+    "hammer",
+    "island",
+    "jungle",
+    "kangaroo"
+  ],
+  "hard": [
+    "aberration",
+    "belligerent",
+    "cognizant",
+    "dichotomy",
+    "ephemeral",
+    "fastidious",
+    "gregarious",
+    "harbinger",
+    "idiosyncrasy",
+    "juxtapose"
+  ]
+}

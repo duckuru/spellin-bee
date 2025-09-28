@@ -125,14 +125,14 @@ export const initMatchmaking = (io, socket) => {
           difficulty
         );
 
-        await updateRoomStatusDBPublic(room.roomId, "playing");
-
         playersToMatch.forEach((p) => {
           io.to(p.socketId).emit("gameFound", {
             room_id: room.room_id,
             players: room.players,
           });
         });
+
+        await updateRoomStatusDBPublic(room.roomId, "playing");
 
         console.log(
           `Room ${room.room_id} created for ${playersToMatch.map(

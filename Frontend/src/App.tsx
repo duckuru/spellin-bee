@@ -10,6 +10,7 @@ import PageLoader from './components/PageLoader';
 import { Toaster } from 'react-hot-toast';
 import CreateLobbyPage from './pages/CreateLobbyPage';
 import GamePage from './pages/game/[room_id]';
+import ResultPage from './pages/ResultPage';
 
 
 function App() {
@@ -63,6 +64,10 @@ function App() {
         <Route
           path="/game/:room_id"
           element={authUser ? <GamePage /> : <Navigate to={"/login"} />}
+        ></Route>
+        <Route
+          path="/result"
+          element={authUser ? <ResultPage /> : <Navigate to={"/login"} />}
         ></Route>
       </Routes>
 
