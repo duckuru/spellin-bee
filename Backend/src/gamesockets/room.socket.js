@@ -39,6 +39,7 @@ async function getOrCreateState(room_id, roomFromDb) {
     maxPlayers: room?.maxPlayers || 6,
     turnTime: room?.turnTime || 20,
     maxRounds: room?.rounds || 3,
+    currentTurnWord: null, // <-- persist current turn word
   };
   await redis.set(redisKey, JSON.stringify(state));
   return state;
@@ -73,7 +74,6 @@ async function finishRoom(io, room_id, state) {
   state.status = "finished";
   await saveState(room_id, state);
 
-  // Persist scores (absolute values)
   for (const [pid, score] of Object.entries(state.scores)) {
     await updatePlayerScore(room_id, pid, score, true);
   }
@@ -127,6 +127,7 @@ async function startTurnForRoom(io, room_id) {
   // Word
   const wordData = await pickWordAndData(state.difficulty);
   state.wordsUsed = [...(state.wordsUsed || []), wordData.word];
+  state.currentTurnWord = wordData; // <-- save word in state
 
   await saveState(room_id, state);
 
@@ -165,6 +166,7 @@ function ensureTurnInterval(io, room_id) {
     if (s.turnTimeLeft <= 0) {
       const endedPlayer = s.currentTurnPlayerId;
       s.currentTurnPlayerId = null;
+      s.currentTurnWord = null; // <-- clear word when turn ends
 
       await saveState(room_id, s);
       io.to(room_id).emit("turnEnded", { playerId: endedPlayer });
@@ -175,7 +177,7 @@ function ensureTurnInterval(io, room_id) {
         s.scores[endedPlayer] || 0,
         true
       );
-      schedulePreTurnIfNeeded(io, room_id, 5000); // 5s countdown
+      schedulePreTurnIfNeeded(io, room_id, 5000);
     }
   };
 
@@ -200,7 +202,11 @@ function scheduleStartIn(io, room_id, ms = 5000) {
     await startTurnForRoom(io, room_id);
   }, ms);
 
-  roomPreTurnTimeouts.set(room_id, { timeoutId: timeout, _start: Date.now(), _ms: ms });
+  roomPreTurnTimeouts.set(room_id, {
+    timeoutId: timeout,
+    _start: Date.now(),
+    _ms: ms,
+  });
 }
 
 async function schedulePreTurnIfNeeded(io, room_id, ms = 10000) {
@@ -247,16 +253,19 @@ export const initRoomSockets = (io, socket) => {
 
       const stateStr = await redis.get(`room:${room_id}`);
       const state = JSON.parse(stateStr);
+
+      // Send full room state including current word
       io.to(socket.id).emit("roomState", {
         currentTurnPlayerId: state.currentTurnPlayerId,
         turnTimeLeft: state.turnTimeLeft,
         currentRound: state.currentRound,
         scores: state.scores,
+        currentTurnWord: state.currentTurnWord || null,
       });
 
       io.to(room_id).emit("roomUpdate", room.players);
 
-      // --- Handle pre-turn countdown for new client ---
+      // Handle pre-turn countdown for new client
       if (!state.currentTurnPlayerId && roomPreTurnTimeouts.has(room_id)) {
         const t = roomPreTurnTimeouts.get(room_id);
         const elapsed = Math.floor((Date.now() - t._start) / 1000);
@@ -265,6 +274,7 @@ export const initRoomSockets = (io, socket) => {
       } else {
         await schedulePreTurnIfNeeded(io, room_id);
       }
+
       console.log(`${username} joined room ${room_id}`);
     } catch (err) {
       console.error("joinRoom error:", err);
@@ -272,6 +282,12 @@ export const initRoomSockets = (io, socket) => {
     }
   });
 
+  // Typing
+  socket.on("typing", ({ room_id, userId, text }) => {
+    socket.to(room_id).emit("typing", { userId, text });
+  });
+
+  // Start Turn
   socket.on("startTurn", async ({ room_id }) => {
     const stateStr = await redis.get(`room:${room_id}`);
     const state = stateStr ? JSON.parse(stateStr) : null;
@@ -279,6 +295,7 @@ export const initRoomSockets = (io, socket) => {
     await startTurnForRoom(io, room_id);
   });
 
+  // Get Room State
   socket.on("getRoomState", async ({ room_id }) => {
     const stateStr = await redis.get(`room:${room_id}`);
     if (!stateStr) return;
@@ -288,9 +305,11 @@ export const initRoomSockets = (io, socket) => {
       turnTimeLeft: state.turnTimeLeft,
       currentRound: state.currentRound,
       scores: state.scores,
+      currentTurnWord: state.currentTurnWord || null,
     });
   });
 
+  // Submit Answer
   socket.on("submitAnswer", async ({ room_id, userId, answer, word }) => {
     try {
       const redisKey = `room:${room_id}`;
@@ -302,13 +321,12 @@ export const initRoomSockets = (io, socket) => {
 
       const isCorrect =
         (answer || "").toLowerCase() === (word || "").toLowerCase();
-      if (isCorrect) {
-        state.scores[userId] = (state.scores[userId] || 0) + 10;
-      }
+      if (isCorrect) state.scores[userId] = (state.scores[userId] || 0) + 10;
 
       const endedPlayer = state.currentTurnPlayerId;
       state.currentTurnPlayerId = null;
       state.turnTimeLeft = 0;
+      state.currentTurnWord = null; // <-- clear word
 
       await saveState(room_id, state);
       await updatePlayerScore(room_id, userId, state.scores[userId], true);
@@ -317,12 +335,13 @@ export const initRoomSockets = (io, socket) => {
       io.to(room_id).emit("answerResult", { userId, isCorrect });
       io.to(room_id).emit("turnEnded", { playerId: endedPlayer });
 
-      schedulePreTurnIfNeeded(io, room_id, 5000); // 5s countdown
+      schedulePreTurnIfNeeded(io, room_id, 5000);
     } catch (err) {
       console.error("submitAnswer error:", err);
     }
   });
 
+  // Leave Room / Disconnect
   socket.on("leaveRoom", async ({ room_id, userId }) => {
     try {
       const room = await fetchRoom(room_id);
@@ -339,10 +358,18 @@ export const initRoomSockets = (io, socket) => {
       if (stateStr) {
         let state = JSON.parse(stateStr);
         state.turnQueue = state.turnQueue.filter((id) => id !== userId);
+
         if (state.currentTurnPlayerId === userId) {
           state.currentTurnPlayerId = null;
+          state.turnTimeLeft = 0;
+          state.currentTurnWord = null;
+          await saveState(room_id, state);
+
+          io.to(room_id).emit("turnEnded", { playerId: userId });
+          schedulePreTurnIfNeeded(io, room_id, 5000);
+        } else {
+          await saveState(room_id, state);
         }
-        await saveState(room_id, state);
       }
 
       const updated = await finalizeRoomIfEmpty(room_id);
@@ -379,10 +406,18 @@ export const initRoomSockets = (io, socket) => {
       if (stateStr) {
         let state = JSON.parse(stateStr);
         state.turnQueue = state.turnQueue.filter((id) => id !== userId);
+
         if (state.currentTurnPlayerId === userId) {
           state.currentTurnPlayerId = null;
+          state.turnTimeLeft = 0;
+          state.currentTurnWord = null;
+          await saveState(room_id, state);
+
+          io.to(room_id).emit("turnEnded", { playerId: userId });
+          schedulePreTurnIfNeeded(io, room_id, 5000);
+        } else {
+          await saveState(room_id, state);
         }
-        await saveState(room_id, state);
       }
 
       const updated = await finalizeRoomIfEmpty(room_id);
