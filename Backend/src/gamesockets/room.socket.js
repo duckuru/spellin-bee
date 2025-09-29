@@ -9,6 +9,8 @@ import {
 import redis from "../redis/client.js";
 import fs from "fs";
 import axios from "axios";
+import { saveMatchandPlayerHistory } from "../controller/history.controller.js";
+import UserData from "../models/Userdata.js";
 
 const wordsData = JSON.parse(fs.readFileSync("./src/word/words.json", "utf8"));
 
@@ -71,24 +73,35 @@ async function pickWordAndData(difficulty) {
 
 // --- Room Finish ---
 async function finishRoom(io, room_id, state) {
+  const redisKey = `room:${room_id}`;
+  const finishedFlag = await redis.get(`${redisKey}:finished`);
+  if (finishedFlag) return; // Already finished
+
+  await redis.set(`${redisKey}:finished`, "true", "EX", 3600); // expires in 1h
+
   state.status = "finished";
   await saveState(room_id, state);
 
-  for (const [pid, score] of Object.entries(state.scores)) {
-    await updatePlayerScore(room_id, pid, score, true);
-  }
+  const room = await fetchRoom(room_id);
+  if (!room) return;
 
+  // ✅ Save histories + update UserData MMR
+  await saveMatchandPlayerHistory(room, state);
+
+  // Normal finish logic
   await updateRoomStatusDBPublic(room_id, "finished");
   io.to(room_id).emit("roomFinished", { message: "Game finished." });
   await finalizeRoomIfEmpty(room_id);
 
   clearRoomInterval(room_id);
   const t = roomPreTurnTimeouts.get(room_id);
-  if (t) clearTimeout(t);
+  if (t) clearTimeout(t.timeoutId || t);
   roomPreTurnTimeouts.delete(room_id);
 
-  await redis.del(`room:${room_id}`);
+  await redis.del(redisKey);
 }
+
+
 
 // --- Turn Handling ---
 async function startTurnForRoom(io, room_id) {
@@ -224,6 +237,8 @@ async function schedulePreTurnIfNeeded(io, room_id, ms = 10000) {
   }
 }
 
+
+
 // --- Socket Init ---
 export const initRoomSockets = (io, socket) => {
   // Join Room
@@ -321,7 +336,13 @@ export const initRoomSockets = (io, socket) => {
 
       const isCorrect =
         (answer || "").toLowerCase() === (word || "").toLowerCase();
-      if (isCorrect) state.scores[userId] = (state.scores[userId] || 0) + 10;
+
+      if (isCorrect) {
+        const baseScore = 10; // you can adjust this multiplier
+        const earnedScore = baseScore * (state.turnTimeLeft || 0);
+
+        state.scores[userId] = (state.scores[userId] || 0) + earnedScore;
+      }
 
       const endedPlayer = state.currentTurnPlayerId;
       state.currentTurnPlayerId = null;
