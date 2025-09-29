@@ -132,7 +132,7 @@ export const initMatchmaking = (io, socket) => {
           });
         });
 
-        await updateRoomStatusDBPublic(room.roomId, "playing");
+        await updateRoomStatusDBPublic(room.room_id, "playing");
 
         console.log(
           `Room ${room.room_id} created for ${playersToMatch.map(
