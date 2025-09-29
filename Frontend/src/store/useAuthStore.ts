@@ -30,6 +30,33 @@ interface LoginFormData {
   password: string;
 }
 
+interface MatchPlayer {
+  userId: string;
+  username: string;
+  rank: string;
+  score: number;
+  mmrChange: number;
+  isActive: boolean;
+}
+
+interface Match {
+  _id: string;
+  room_id: string;
+  players: MatchPlayer[];
+  createdAt: string;
+}
+
+interface History {
+  _id: string;
+  room_id: string;
+  userId: string;
+  mmrChange: number;
+  rank: string;
+  points: number;
+  createdAt: string;
+  username: string;
+}
+
 interface AuthState {
   authUser: User | null;
   userData: UserData | null;
@@ -47,6 +74,13 @@ interface AuthState {
   logout: () => void;
   connectSocket: () => void;
   disconnectSocket: () => void;
+
+  myMatches: Match[];
+  isLoadingMatches: boolean;
+  fetchMyMatches: () => Promise<void>;
+  myHistory: History[];
+  isLoadingHistory: boolean;
+  fetchMyHistory: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -59,6 +93,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoggingIn: false,
   socket: null,
   onlineUsers: [],
+
+  myMatches: [],
+  isLoadingMatches: false,
+  myHistory: [],
+  isLoadingHistory: false,
 
   // ✅ Check auth status from backend
   checkAuth: async () => {
@@ -132,6 +171,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error:any) {
       toast.error(error.response.data.message);
       console.log("Logout Error: ", error);
+    }
+  },
+
+  fetchMyMatches: async () => {
+    set({ isLoadingMatches: true });
+    try {
+      const res = await axiosInstance.get("/getMatchHistoryForMe");
+      set({ myMatches: res.data });
+      console.log(res.data);
+    } catch (err: any) {
+      console.error("Failed to fetch matches", err);
+      toast.error(err.response?.data?.message || "Failed to fetch matches");
+      set({ myMatches: [] });
+    } finally {
+      set({ isLoadingMatches: false });
+    }
+  },
+
+  fetchMyHistory: async () => {
+    set({ isLoadingHistory: true });
+    try {
+      const res = await axiosInstance.get("/getPlayerHistoryForMe");
+      set({ myHistory: res.data });
+      console.log(res.data);
+    } catch (err: any) {
+      console.error("Failed to fetch matches", err);
+      toast.error(err.response?.data?.message || "Failed to fetch matches");
+      set({ myHistory: [] });
+    } finally {
+      set({ isLoadingHistory: false });
     }
   },
 

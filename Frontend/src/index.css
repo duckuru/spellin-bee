@@ -2,6 +2,11 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+html, body {
+  overflow: hidden;
+  height: 100%;
+}
+
 .sour-gummy-elight {
   font-family: "Sour Gummy", sans-serif;
   font-optical-sizing: auto;

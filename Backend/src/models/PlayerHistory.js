@@ -8,11 +8,10 @@ const playerHistorySchema = new mongoose.Schema(
       require: true
       //forign key from User _id
     },
-    roomId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Room", //user model
-      require: true
-      //forign key from User _id
+    room_id: {
+      type: String,
+      required: true,   // not "require"
+      unique: true,     // each room_id should only appear once
     },
     username: {
       type: String,

@@ -2,11 +2,13 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { UserIcon, LogOutIcon } from "lucide-react";
 import MainContent from "../components/content/MainContent";
+import { useNavigate } from "react-router";
 
 function MainPage() {
   const { authUser, logout } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -21,6 +23,10 @@ function MainPage() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleGoProfile = () => {
+    navigate("/profile");
+  }
 
   if (!authUser) return null;
 
@@ -59,7 +65,7 @@ function MainPage() {
             <div className="absolute right-0 mt-2 w-44 bg-transparent border-2 border-[#795a3e] rounded-xl shadow-lg overflow-hidden z-50">
               <button
                 className="flex items-center gap-2 w-full px-4 py-2 text-[#3f3f3f] text-xl font-bold hover:bg-[#ffe08d] rounded-xl transition-colors"
-                onClick={() => alert("Go to profile")}
+                onClick={handleGoProfile}
               >
                 <UserIcon className="w-5 h-5" />
                 Profile

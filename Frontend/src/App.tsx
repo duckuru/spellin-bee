@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useNavigate } from 'react-router'
+import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router'
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import MainPage from './pages/MainPage';
@@ -10,7 +10,8 @@ import PageLoader from './components/PageLoader';
 import { Toaster } from 'react-hot-toast';
 import CreateLobbyPage from './pages/CreateLobbyPage';
 import GamePage from './pages/game/[room_id]';
-import ResultPage from './pages/ResultPage';
+import ResultPage from './pages/result/[result_id]';
+import ProfilePage from './pages/ProfilePage';
 
 
 function App() {
@@ -21,6 +22,16 @@ function App() {
   useEffect(() => {
     checkAuth()
   },[checkAuth])
+
+  // Wrapper to inject route params and authUser ID
+  const ResultPageWrapper: React.FC<{ authUser: any }> = ({ authUser }) => {
+    const { room_id } = useParams<{ room_id: string }>();
+
+    if (!room_id) return <p>Invalid result</p>;
+
+    return <ResultPage room_id={room_id} userId={authUser?._id || ""} />;
+  };
+
 
   console.log({authUser})
   console.log({onlineUsers})
@@ -58,6 +69,10 @@ function App() {
           element={!authUser ? <SignupPage /> : <Navigate to={"/main"} />}
         ></Route>
         <Route
+          path="/profile"
+          element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
+        ></Route>
+        <Route
           path="/create-lobby"
           element={authUser ? <CreateLobbyPage /> : <Navigate to={"/login"} />}
         ></Route>
@@ -66,9 +81,11 @@ function App() {
           element={authUser ? <GamePage /> : <Navigate to={"/login"} />}
         ></Route>
         <Route
-          path="/result"
-          element={authUser ? <ResultPage /> : <Navigate to={"/login"} />}
-        ></Route>
+          path="/results/:room_id"
+          element={
+            authUser ? <ResultPageWrapper authUser={authUser} /> : <Navigate to={"/login"} />
+          }
+        />
       </Routes>
 
       <Toaster />

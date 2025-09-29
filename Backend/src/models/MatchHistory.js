@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 
 const matchHistorySchema = new mongoose.Schema(
   {
-    roomId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Room", //user model
-      require: true,
-      //forign key from User _id
+    room_id: {
+      type: String,
+      required: true,   // not "require"
+      unique: true,     // each room_id should only appear once
     },
     players: {
       type: [

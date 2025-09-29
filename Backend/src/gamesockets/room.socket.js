@@ -73,12 +73,6 @@ async function pickWordAndData(difficulty) {
 
 // --- Room Finish ---
 async function finishRoom(io, room_id, state) {
-  const redisKey = `room:${room_id}`;
-  const finishedFlag = await redis.get(`${redisKey}:finished`);
-  if (finishedFlag) return; // Already finished
-
-  await redis.set(`${redisKey}:finished`, "true", "EX", 3600); // expires in 1h
-
   state.status = "finished";
   await saveState(room_id, state);
 
@@ -98,9 +92,8 @@ async function finishRoom(io, room_id, state) {
   if (t) clearTimeout(t.timeoutId || t);
   roomPreTurnTimeouts.delete(room_id);
 
-  await redis.del(redisKey);
+  await redis.del(`room:${room_id}`);
 }
-
 
 
 // --- Turn Handling ---
