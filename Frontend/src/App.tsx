@@ -23,18 +23,9 @@ function App() {
     checkAuth()
   },[checkAuth])
 
-  // Wrapper to inject route params and authUser ID
-  const ResultPageWrapper: React.FC<{ authUser: any }> = ({ authUser }) => {
-    const { room_id } = useParams<{ room_id: string }>();
 
-    if (!room_id) return <p>Invalid result</p>;
-
-    return <ResultPage room_id={room_id} userId={authUser?._id || ""} />;
-  };
-
-
-  console.log({authUser})
-  console.log({onlineUsers})
+  // console.log({authUser})
+  // console.log({onlineUsers})
 
   if(isCheckingAuth) return <PageLoader/>
 
@@ -82,10 +73,8 @@ function App() {
         ></Route>
         <Route
           path="/results/:room_id"
-          element={
-            authUser ? <ResultPageWrapper authUser={authUser} /> : <Navigate to={"/login"} />
-          }
-        />
+          element={authUser ? <ResultPage /> : <Navigate to={"/login"} />}
+        ></Route>
       </Routes>
 
       <Toaster />

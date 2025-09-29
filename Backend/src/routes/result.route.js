@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllMatchForUser, getAllPlayerHistoryForUser, getMatchHistory, getPlayerHistory } from "../controller/history.controller.js";
+import { getAllMatchForUser, getAllPlayerHistoryForUser, getMatchHistory, getPlayerHistory, getMatchHistoryByRoom } from "../controller/history.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
@@ -7,6 +7,8 @@ router.get("/match-history/:room_id", getMatchHistory);
 router.get("/player-history/:room_id/:userId", getPlayerHistory);
 router.get("/getMatchHistoryForMe",protectRoute, getAllMatchForUser);
 router.get("/getPlayerHistoryForMe",protectRoute, getAllPlayerHistoryForUser);
+router.get("/match-history/:room_id", protectRoute, getMatchHistoryByRoom);
+
 
 
 

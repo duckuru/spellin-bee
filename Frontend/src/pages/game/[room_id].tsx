@@ -113,6 +113,7 @@ function GamePage() {
       setTurnWord(null);
       setTurnTimeLeft(0);
       setMyInput("");
+      setOthersTyping({});
     };
 
     const handleScoreUpdate = (scores: Record<string, number>) => {

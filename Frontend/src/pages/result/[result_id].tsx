@@ -1,35 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useResultStore } from "../../store/useResultStore";
-import { useAuthStore } from "../../store/useAuthStore";
-import ResultPopup from "../../components/popup/resultpopup";
+import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrown } from "@fortawesome/free-solid-svg-icons";
+import ResultPopup from "../../components/popup/resultpopup";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useResultStore } from "../../store/useResultStore";
 
 const ResultPage: React.FC = () => {
   const { room_id } = useParams<{ room_id: string }>();
   const { authUser } = useAuthStore();
   const userId = authUser?._id;
 
-  const { players, loading, fetchResult } = useResultStore();
+  const { players, loadingHistory, fetchResult } = useResultStore();
   const [showPopup, setShowPopup] = useState(false);
+  const duration = 1.2;
 
   useEffect(() => {
     if (room_id) fetchResult(room_id);
   }, [room_id, fetchResult]);
 
-  if (loading) return <p className="text-center mt-10">Loading results...</p>;
+  if (loadingHistory) return <p className="text-center mt-10">Loading results...</p>;
   if (!players.length) return <p className="text-center mt-10">No results found</p>;
+
+  const getPodiumPlayer = (rank: number) =>
+    players.find((p) => p.rank === rank) || { _id: `placeholder-${rank}`, username: "N/A", score: 0, rank };
+
+  const podiumLayout = [getPodiumPlayer(2), getPodiumPlayer(1), getPodiumPlayer(3)];
+
+  const animationOrder = [getPodiumPlayer(3), getPodiumPlayer(2), getPodiumPlayer(1)];
+  const delays = animationOrder.reduce((acc, player, idx) => {
+    acc[player.rank!] = idx * duration;
+    return acc;
+  }, {} as Record<number, number>);
 
   const crownColors: Record<number, string> = { 1: "#FFD700", 2: "#C0C0C0", 3: "#CD7F32" };
   const heights: Record<number, string> = { 1: "35rem", 2: "28rem", 3: "21rem" };
 
-  // Podium layout: 2nd - 1st - 3rd
-  const getPodiumPlayer = (rank: number) => players.find((p) => p.rank === rank) || { name: "N/A", score: 0, rank };
-  const podiumLayout = [getPodiumPlayer(2), getPodiumPlayer(1), getPodiumPlayer(3)];
-
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 pt-12 text-[#3f3f3f] overflow-hidden">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 pt-12 text-[#3f3f3f] z-50 overflow-hidden">
       <div className="relative w-[70rem] bg-[#f3f3f3] rounded-xl border-2 border-[#795A3E] h-[45rem] flex items-end justify-center">
         <button
           onClick={() => setShowPopup(true)}
@@ -40,34 +49,41 @@ const ResultPage: React.FC = () => {
 
         <div className="flex items-end gap-16">
           {podiumLayout.map((player) => (
-            <div
-              key={player.rank}
-              style={{ height: heights[player.rank] }}
+            <motion.div
+              key={player._id}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: heights[player.rank!] || "20rem", opacity: 1 }}
+              transition={{ duration, delay: delays[player.rank!] || 0, ease: "easeOut" }}
               className="w-48 bg-[#ffc105] rounded-t-xl flex flex-col items-center justify-center shadow-lg relative"
             >
               <div className="absolute -top-24 flex flex-col items-center">
                 <FontAwesomeIcon
                   icon={faCrown}
                   className="text-6xl"
-                  style={{ color: crownColors[player.rank] || "#888" }}
+                  style={{ color: crownColors[player.rank!] || "#888" }}
                 />
-                <p className="quicksand-semi text-3xl">{player.name}</p>
+                <p className="quicksand-semi text-3xl">{player.username}</p>
                 <div className="quicksand-semi mt-2 text-4xl">
                   {player.rank === 1 ? "1st" : player.rank === 2 ? "2nd" : "3rd"}
                 </div>
               </div>
 
-              <div className="absolute top-1/2 -translate-y-1/2 text-3xl font-bold flex flex-col items-center justify-center">
+              <motion.div
+                className="absolute top-1/2 -translate-y-1/2 text-3xl font-bold flex flex-col items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: delays[player.rank!] || 0, ease: "easeOut" }}
+              >
                 Points
                 <div>{player.score}</div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ))}
         </div>
       </div>
 
-      {showPopup && room_id && userId && (
-        <ResultPopup onClose={() => setShowPopup(false)} userId={userId} room_id={room_id} />
+      {showPopup && userId && room_id && (
+        <ResultPopup onClose={() => setShowPopup(false)} room_id={room_id} />
       )}
     </div>
   );

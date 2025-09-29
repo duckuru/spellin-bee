@@ -148,4 +148,24 @@ export const getAllPlayerHistoryForUser = async (req, res) => {
   }
 };
 
+//test
+
+// GET /api/match-history/:room_id
+export const getMatchHistoryByRoom = async (req, res) => {
+  try {
+    const { room_id } = req.params;
+
+    // Fetch the full room match
+    const match = await MatchHistory.findOne({ room_id }).lean();
+
+    if (!match) return res.status(404).json({ message: "Match not found" });
+
+    res.status(200).json(match);
+  } catch (err) {
+    console.error("❌ Failed to fetch match history:", err);
+    res.status(500).json({ message: "Failed to fetch match history" });
+  }
+};
+
+
 
