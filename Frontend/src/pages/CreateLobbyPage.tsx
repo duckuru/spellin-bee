@@ -18,6 +18,8 @@ export default function LobbyPage() {
   const { room_id: paramRoomId } = useParams<{ room_id: string }>();
   const { authUser, socket } = useAuthStore();
 
+  // backup
+
   if (!authUser) return <div>Loading...</div>;
   if (!socket) return <div>Connecting to socket...</div>;
 
