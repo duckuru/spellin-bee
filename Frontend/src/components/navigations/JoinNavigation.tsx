@@ -1,18 +1,22 @@
-import React from 'react'
-import { useNavigate } from 'react-router';
+import { useMatchmakingStore } from "../../store/useMatchmakingStore";
 
-function JoinNavigation() {
-  const navigate = useNavigate();
+interface JoinNavigationProps {
+  setMode: (mode: "default" | "joinLobby") => void;
+}
 
-  const handleNavJoin = () => {
-    navigate("/join-lobby")
-  }
+function JoinNavigation({ setMode }: JoinNavigationProps) {
+  const { leaveQueue } = useMatchmakingStore();
+
+  const handleClick = () => {
+    leaveQueue(); // stop any active matchmaking
+    setMode("joinLobby");
+  };
 
   return (
     <div className="px-6 pt-6">
       <button
         className="text-[3rem] quicksand-bold bg-[#FDDB5B] text-[#3f3f3f] w-full p-1 border-2 border-[#795A3E] hover:bg-[#FFC105] rounded-xl"
-        onClick={handleNavJoin}
+        onClick={handleClick}
       >
         Join Lobby
       </button>
@@ -20,4 +24,4 @@ function JoinNavigation() {
   );
 }
 
-export default JoinNavigation
+export default JoinNavigation;

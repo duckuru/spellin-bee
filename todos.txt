@@ -1,0 +1,15 @@
+❌ = ✅
+[❌] = Leaderboard backend fetch from user.UserData < get Username and rank(mmr)
+[❌] = Styling Result page
+[❌] = Styling Lobby Page
+[❌] = Styling Leaderboard page
+[❌] = Styling Profile page
+
+[❌] = User Profile Pic update with cloudinary
+[❌] = Ads sense
+[❌] = Deploy
+[❌] = Poster
+[❌] = Doc
+[❌] = Timeline
+[❌] = Slide
+

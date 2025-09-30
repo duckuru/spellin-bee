@@ -62,7 +62,8 @@ export default function LobbyPage() {
       setPlayers(lobby.players.slice(0, 6));
       setSettings(lobby.settings);
       setRoomId(lobby.room_id);
-      setRoomLink(`${window.location.origin}/lobby/${lobby.room_id}`);
+      // setRoomLink(`${window.location.origin}/lobby/${lobby.room_id}`);
+      setRoomLink(`${lobby.room_id}`);
     });
 
     // Game starting
@@ -85,7 +86,12 @@ export default function LobbyPage() {
   }, [socket]);
 
   // --- Handlers ---
-  const handleBack = () => navigate("/main");
+  const handleBack = () => {
+  if (socket && room_id && authUser?._id) {
+    socket.emit("leaveLobby", { room_id, userId: authUser._id });
+  }
+  navigate("/main");
+};
 
   const handleCreateLobby = () => {
     if (!socket || !authUser) return;

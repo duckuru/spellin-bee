@@ -1,18 +1,23 @@
-import React from 'react'
-import { useNavigate } from 'react-router';
+import { useMatchmakingStore } from "../../store/useMatchmakingStore";
 
-function LeaderboardNavigation() {
-const navigate = useNavigate();
+interface LeaderboardNavigationProps {
+    onClick?: () => void;
+}
 
-  const handleNavCreate = () => {
-    navigate("/Leaderboard")
-  }
+function LeaderboardNavigation({ onClick }: LeaderboardNavigationProps) {
+  const {leaveQueue} = useMatchmakingStore();
+  const handleClick = () => {
+    if (onClick) onClick();
+    leaveQueue();
+    // any other internal logic
+  };
+
 
   return (
     <div className="px-6 pt-6">
       <button
         className="text-[3rem] quicksand-bold bg-[#FDDB5B] text-[#3f3f3f] w-full p-1 border-2 border-[#795A3E] hover:bg-[#FFC105] rounded-xl"
-        onClick={handleNavCreate}
+        onClick={handleClick}
       >
         Leaderboard
       </button>
