@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router'
+import { Navigate, Route, Routes} from 'react-router'
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import MainPage from './pages/MainPage';
@@ -8,16 +8,16 @@ import { useEffect, useMemo } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import PageLoader from './components/PageLoader';
 import { Toaster } from 'react-hot-toast';
-import CreateLobbyPage from './pages/CreateLobbyPage';
 import GamePage from './pages/game/[room_id]';
 import ResultPage from './pages/result/[result_id]';
 import ProfilePage from './pages/ProfilePage';
+import LobbyPage from './pages/CreateLobbyPage';
 
 
 function App() {
   const colors = useMemo(() => ["#795a3e", "#fddb59", "#ffc105", "#f3f3f3", "#3f3f3f",], []);
 
-  const {checkAuth, isCheckingAuth, authUser , onlineUsers} = useAuthStore();
+  const {checkAuth, isCheckingAuth, authUser} = useAuthStore();
 
   useEffect(() => {
     checkAuth()
@@ -64,8 +64,8 @@ function App() {
           element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
         ></Route>
         <Route
-          path="/create-lobby"
-          element={authUser ? <CreateLobbyPage /> : <Navigate to={"/login"} />}
+          path="/lobby/:room_id?"
+          element={authUser ? <LobbyPage /> : <Navigate to={"/login"} />}
         ></Route>
         <Route
           path="/game/:room_id"

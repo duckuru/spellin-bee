@@ -23,11 +23,9 @@ const playerHistorySchema = new mongoose.Schema(
     },
     mmrChange: {
       type: Number,
-      require: true,
     },
     rank: {
       type: String,
-      require: true,
     },
   },
   { timestamps: true }

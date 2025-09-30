@@ -33,7 +33,7 @@ const roomSchema = new mongoose.Schema(
             required: true,
           },
           username: { type: String, required: true },
-          rank: { type: String, required: true },
+          rank: { type: String},
           score: { type: Number, default: 0 },
           isActive: { type: Boolean, default: true },
         },

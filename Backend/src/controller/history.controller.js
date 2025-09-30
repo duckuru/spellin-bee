@@ -4,27 +4,32 @@ import PlayerHistory from "../models/PlayerHistory.js";
 import UserData from "../models/Userdata.js";
 import { calculateMMRChange } from "../utils/mmr.js";
 import { getRankByMMR } from "../utils/rank.js";
-
-// Save match and player history after a room finishes
+/**
+ * Save match and player history after a room finishes.
+ * Only apply MMR changes if room.isPublic === true
+ */
 export const saveMatchandPlayerHistory = async (room, state) => {
   try {
     if (!room || !state) throw new Error("Room or state missing");
 
+    const isPublic = room.isPublic ?? true;
     const playersWithMMR = [];
 
     for (const player of room.players) {
       const userId = player.userId.toString();
       const score = state.scores[userId] || 0;
 
-      // ✅ Calculate MMR change
-      const mmrChange = calculateMMRChange(score, player.rank);
+      // Only calculate MMR change if public room
+      const mmrChange = isPublic ? calculateMMRChange(score, player.rank) : 0;
 
-      // ✅ Update UserData with MMR + rank
-      const userData = await UserData.findOne({ userId: player.userId });
-      if (userData) {
-        userData.mmr += mmrChange;
-        userData.rank = getRankByMMR(userData.mmr);
-        await userData.save();
+      // Update UserData with MMR + rank if public
+      if (isPublic) {
+        const userData = await UserData.findOne({ userId: player.userId });
+        if (userData) {
+          userData.mmr += mmrChange;
+          userData.rank = getRankByMMR(userData.mmr);
+          await userData.save();
+        }
       }
 
       // Build record for MatchHistory
@@ -37,7 +42,7 @@ export const saveMatchandPlayerHistory = async (room, state) => {
         isActive: player.isActive,
       });
 
-      // ✅ Upsert PlayerHistory to prevent duplicates
+      // Upsert PlayerHistory (MMR = 0 if private)
       await PlayerHistory.findOneAndUpdate(
         { room_id: room.room_id, userId: player.userId },
         {
@@ -50,10 +55,10 @@ export const saveMatchandPlayerHistory = async (room, state) => {
       );
     }
 
-    // ✅ Upsert MatchHistory to prevent duplicates
+    // Upsert MatchHistory
     const matchHistory = await MatchHistory.findOneAndUpdate(
       { room_id: room.room_id },
-      { players: playersWithMMR },
+      { players: playersWithMMR, isPublic }, // store isPublic for reference
       { upsert: true, new: true }
     );
 
@@ -63,6 +68,8 @@ export const saveMatchandPlayerHistory = async (room, state) => {
     throw err;
   }
 };
+
+
 
 
 // GET match history - read-only

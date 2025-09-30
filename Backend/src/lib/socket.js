@@ -5,6 +5,7 @@ import {ENV} from "./env.js";
 import { socketAuthMiddleware } from "../middleware/socket.auth.middleware.js";
 import { initMatchmaking } from "../gamesockets/matchmaking.js";
 import { initRoomSockets } from "../gamesockets/room.socket.js";
+import { initLobbySockets } from "../gamesockets/lobby.socket.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -37,6 +38,7 @@ io.on("connection", (socket) => {
 
   initMatchmaking(io, socket);
   initRoomSockets(io, socket);
+  initLobbySockets(io, socket);
 
   //socket.on(), we are listening for event from frontend(clients);
   socket.on("disconnect", () => {

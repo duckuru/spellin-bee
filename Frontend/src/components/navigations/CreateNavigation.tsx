@@ -1,4 +1,3 @@
-import React from 'react'
 import { useNavigate } from 'react-router';
 
 function CreateNavigation() {
@@ -6,7 +5,7 @@ function CreateNavigation() {
   const navigate = useNavigate();
 
   const handleNavCreate = () => {
-    navigate("/create-lobby")
+    navigate("/lobby")
   }
 
   return (

@@ -2,24 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import { useResultStore } from "../../store/useResultStore";
 
 interface PlayerHistoryItem {
   username: string;
   points: number;
   mmrChange: number;
   rank: string;
-  createdAt: string;
-}
-
-interface MatchPlayer {
-  username: string;
-  score: number;
-  rank: number;
-}
-
-interface MatchHistoryItem {
-  room_id: string;
-  players: MatchPlayer[];
   createdAt: string;
 }
 
@@ -30,39 +19,45 @@ interface ResultPopupProps {
 
 const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
   const [activeTab, setActiveTab] = useState<"match" | "player">("match");
-  const [matchHistory, setMatchHistory] = useState<MatchHistoryItem | null>(null);
   const [playerHistory, setPlayerHistory] = useState<PlayerHistoryItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingPlayerHistory, setLoadingPlayerHistory] = useState(false);
+
   const { authUser } = useAuthStore();
   const userId = authUser?._id;
 
   const navigate = useNavigate();
 
+  // Zustand store for match result
+  const { players, loadingPlayers, fetchResult } = useResultStore();
+
+  // Fetch player history with axios directly
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPlayerHistory = async () => {
       if (!room_id || !userId) return;
 
-      setLoading(true);
+      setLoadingPlayerHistory(true);
       try {
-        if (activeTab === "match") {
-          const res = await axios.get(`http://localhost:3000/api/match-history/${room_id}`, {
-            withCredentials: true,
-          });
-          setMatchHistory(res.data || null);
-        } else {
-          const res = await axios.get(`http://localhost:3000/api/player-history/${room_id}/${userId}`, {
-            withCredentials: true,
-          });
-          setPlayerHistory(Array.isArray(res.data) ? res.data : []);
-        }
+        const res = await axios.get(
+          `http://localhost:3000/api/player-history/${room_id}/${userId}`,
+          { withCredentials: true }
+        );
+        setPlayerHistory(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        console.error(err);
+        console.error("❌ Failed to fetch player history:", err);
+        setPlayerHistory([]);
       } finally {
-        setLoading(false);
+        setLoadingPlayerHistory(false);
       }
     };
-    fetchData();
-  }, [activeTab, room_id, userId]);
+
+    if (activeTab === "match") {
+      console.log("Fetching match history from store for room:", room_id);
+      fetchResult(room_id);
+    } else if (activeTab === "player") {
+      console.log("Fetching player history for user:", userId, "in room:", room_id);
+      fetchPlayerHistory();
+    }
+  }, [activeTab, room_id, userId, fetchResult]);
 
   const handleClose = () => {
     if (onClose) onClose();
@@ -70,8 +65,8 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
-      <div className="bg-white rounded-xl w-3/4 max-w-4xl p-6 relative">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50" onClick={handleClose}>
+      <div className="bg-white rounded-xl w-3/4 max-w-4xl p-6 relative " onClick={(e) => e.stopPropagation()}>
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 text-xl font-bold hover:text-red-500"
@@ -103,52 +98,45 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
 
         {/* Tab Content */}
         <div className="max-h-[60vh] overflow-y-auto">
-          {loading && <p>Loading...</p>}
-
           {/* MATCH HISTORY */}
-          {!loading &&
-            activeTab === "match" &&
-            matchHistory?.players?.length ? (
+          {activeTab === "match" ? (
+            loadingPlayers ? (
+              <p>Loading match history...</p>
+            ) : players.length > 0 ? (
               <div className="mb-4 p-4 border rounded-lg bg-gray-50">
-                <p className="font-bold">Room ID: {matchHistory.room_id}</p>
-                <p className="text-gray-500 text-sm">
-                  Date: {new Date(matchHistory.createdAt).toLocaleString()}
-                </p>
                 <ul className="mt-2">
-                  {matchHistory.players.map((p, idx) => (
-                    <li key={idx} className="flex justify-between border-b py-1">
+                  {players.map((p) => (
+                    <li key={p._id} className="flex justify-between border-b py-1">
                       <span>{p.username}</span>
                       <span>
-                        {p.score} pts ({p.rank})
+                        {p.score} pts (Rank {p.rank})
                       </span>
                     </li>
                   ))}
                 </ul>
               </div>
             ) : (
-              !loading &&
-              activeTab === "match" && <p>No match history available.</p>
-            )}
+              <p>No match history available.</p>
+            )
+          ) : null}
 
           {/* PLAYER HISTORY */}
-          {!loading &&
-            activeTab === "player" &&
-            playerHistory.length > 0 ? (
+          {activeTab === "player" ? (
+            loadingPlayerHistory ? (
+              <p>Loading player history...</p>
+            ) : playerHistory.length > 0 ? (
               playerHistory.map((item, idx) => (
                 <div key={idx} className="mb-4 p-4 border rounded-lg bg-gray-50">
                   <p className="font-bold">{item.username}</p>
-                  <p className="text-gray-500 text-sm">
-                    Date: {new Date(item.createdAt).toLocaleString()}
-                  </p>
                   <p>Points: {item.points}</p>
                   <p>MMR Change: {item.mmrChange}</p>
                   <p>Rank: {item.rank}</p>
                 </div>
               ))
             ) : (
-              !loading &&
-              activeTab === "player" && <p>No player history available.</p>
-            )}
+              <p>No player history available.</p>
+            )
+          ) : null}
         </div>
       </div>
     </div>

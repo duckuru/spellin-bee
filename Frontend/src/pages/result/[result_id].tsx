@@ -83,7 +83,7 @@ const ResultPage: React.FC = () => {
       </div>
 
       {showPopup && userId && room_id && (
-        <ResultPopup onClose={() => setShowPopup(false)} room_id={room_id} />
+        <ResultPopup onClose={() => setShowPopup(false)} room_id={room_id}/>
       )}
     </div>
   );

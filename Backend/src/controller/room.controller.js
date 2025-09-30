@@ -1,6 +1,44 @@
 import { nanoid } from "nanoid";
 import Room from "../models/Room.js";
 
+
+/**
+ * Create a room in DB using frontend-provided data
+ * @param {Object} lobbyData - Data from frontend lobby
+ * @param {string} lobbyData.roomId - Room ID generated on frontend
+ * @param {Array} lobbyData.players - Array of player objects { userId, username, isActive, score }
+ * @param {number} lobbyData.rounds
+ * @param {string} lobbyData.difficulty
+ * @param {number} lobbyData.turnTime
+ */
+export const createRoomFromLobby = async (lobbyData) => {
+  if (!lobbyData.room_id) throw new Error("roomId is required");
+
+  // Cap maxPlayers at 6
+  const maxPlayers = Math.min(lobbyData.players.length, 6);
+
+  const room = new Room({
+    room_id: lobbyData.room_id,
+    status: "waiting",
+    isPublic: false,
+    rounds: lobbyData.rounds || 3,
+    difficulty: lobbyData.difficulty || "Easy",
+    turnTime: lobbyData.turnTime || 20,
+    maxPlayers,
+    players: lobbyData.players.map(p => ({
+      userId: p.userId,
+      username: p.username,
+      isActive: p.isActive ?? true,
+      score: p.score ?? 0
+    }))
+  });
+
+  await room.save();
+  console.log("Room created from lobby:", room);
+  return room;
+};
+
+
 export const createRoomInDBPublic = async (players, rank_range, difficulty) => {
 
   const room = new Room({
@@ -19,6 +57,8 @@ export const createRoomInDBPublic = async (players, rank_range, difficulty) => {
   console.log("Room document:", room);
   return room;
 }
+
+
 
 // ✅ Update status of a room (e.g., waiting -> playing)
 export const updateRoomStatusDBPublic = async (room_id, status) => {
