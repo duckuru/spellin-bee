@@ -6,6 +6,8 @@
 [❌] = Styling Leaderboard page
 [❌] = Styling Profile page
 
+[❌] = Add more word to the JSON(word.json in backend)
+
 [❌] = User Profile Pic update with cloudinary
 [❌] = Ads sense
 [❌] = Deploy
