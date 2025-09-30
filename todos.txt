@@ -1,5 +1,6 @@
 ❌ = ✅
-[❌] = Leaderboard backend fetch from user.UserData < get Username and rank(mmr)
+[✅] = Leaderboard backend fetch from user.UserData < get Username and rank(mmr)
+
 [❌] = Styling Result page
 [❌] = Styling Lobby Page
 [❌] = Styling Leaderboard page
