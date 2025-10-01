@@ -9,7 +9,7 @@ interface User {
   _id: string;
   email: string;
   username: string;
-  profilePic: string;
+  profilePic?: string;
 }
 
 interface UserData {
@@ -65,10 +65,12 @@ interface AuthState {
   isCheckingAuth: boolean;
   isSigningUp: boolean;
   isLoggingIn: boolean;
+  isUpdatingProfileImage: boolean,
   socket: Socket | null;
   onlineUsers: string[];
 
   checkAuth: () => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<void>;
   signup: (data: SignupFormData) => void;
   login: (data: LoginFormData) => void;
   logout: () => void;
@@ -91,6 +93,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isCheckingAuth: true,
   isSigningUp: false,
   isLoggingIn: false,
+  isUpdatingProfileImage: false,
   socket: null,
   onlineUsers: [],
 
@@ -115,6 +118,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ authUser: null, userData: null, isLoggedIn: false });
     } finally {
       set({ isLoading: false, isCheckingAuth: false });
+    }
+  },
+
+  updateProfile: async (data: Partial<User>) => {
+    set({ isUpdatingProfileImage: true });
+    try {
+      const res = await axiosInstance.put("/auth/update-profile", data);
+      set({authUser: res.data})
+      toast.success("Profile update successfully")
+    } catch (error:any) {
+      console.log("Error updating profile:", error);
+      toast.error(error.response.data.message);
+    }finally {
+      set({ isUpdatingProfileImage: false });
     }
   },
 

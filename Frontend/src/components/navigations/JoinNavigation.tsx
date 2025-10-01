@@ -2,9 +2,10 @@ import { useMatchmakingStore } from "../../store/useMatchmakingStore";
 
 interface JoinNavigationProps {
   setMode: (mode: "default" | "joinLobby") => void;
+  isActive?: boolean;
 }
 
-function JoinNavigation({ setMode }: JoinNavigationProps) {
+function JoinNavigation({ setMode,isActive }: JoinNavigationProps) {
   const { leaveQueue } = useMatchmakingStore();
 
   const handleClick = () => {
@@ -15,7 +16,9 @@ function JoinNavigation({ setMode }: JoinNavigationProps) {
   return (
     <div className="px-6 pt-6">
       <button
-        className="text-[3rem] quicksand-bold bg-[#FDDB5B] text-[#3f3f3f] w-full p-1 border-2 border-[#795A3E] hover:bg-[#FFC105] rounded-xl"
+  className={`text-[3rem] quicksand-bold w-full p-1 border-2 border-[#795A3E] rounded-xl text-[#3f3f3f] 
+    ${isActive ? "bg-[#FFC105]" : "bg-[#FDDB5B]"} 
+    hover:bg-[#FFC105]`}
         onClick={handleClick}
       >
         Join Lobby

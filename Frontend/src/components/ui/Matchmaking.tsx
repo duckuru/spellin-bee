@@ -7,7 +7,7 @@ interface MatchmakeProps {
   stopMatchmaking: () => void;
 }
 
-export default function Matchmaking() {
+export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
   const matchmake = [
     "Matchmaking",
     "Matchmaking.",
@@ -25,12 +25,6 @@ export default function Matchmaking() {
     return () => clearInterval(interval);
   }, [matchmake.length]);
 
-  // const handleLeaveQueue = () => {
-  //   // socket.emit("leaveQueue");
-  //   stopMatchmaking(); // hide the Matchmake component
-  //   console.log("Left the matchmaking queue");
-  // };
-
   return (
     <div className="flex flex-row items-center justify-center gap-4 z-50">
       {/* Background box stays same size */}
@@ -46,7 +40,10 @@ export default function Matchmaking() {
 
       {/* Leave queue button */}
       <button
-        onClick={leaveQueue}
+        onClick={() => {
+    leaveQueue();             // your store action
+    if (stopMatchmaking) stopMatchmaking(); // reset Play button
+  }}
         className="bg-[#f3f3f3] opacity-80 hover:opacity-100 hover:bg-[#f3f3f3] 
                    shadow-md border-2 border-[#795a3e] rounded-lg h-[5.625rem] w-[5.625rem]"
       >

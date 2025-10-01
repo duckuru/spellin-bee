@@ -86,6 +86,14 @@ export const initLobbySockets = (io, socket) => {
         lobby.players[0].isHost = true;
       }
 
+      // if host left OR no players remain → destroy lobby
+      // const hostLeft = !lobby.players.some(p => p.isHost);
+      // if (lobby.players.length === 0 || hostLeft) {
+      //   await redis.del(`lobby:${room_id}`);
+      //   io.to(room_id).emit("lobbyUpdate", null); // 🚨 tell clients to leave
+      //   return;
+      // }
+
       await redis.set(`lobby:${room_id}`, JSON.stringify(lobby), "EX", 3600);
       socket.leave(room_id);
       io.to(room_id).emit("lobbyUpdate", lobby);

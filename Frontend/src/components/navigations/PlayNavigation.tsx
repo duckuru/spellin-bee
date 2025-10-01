@@ -8,9 +8,10 @@ import { useMatchmakingStore } from '../../store/useMatchmakingStore';
 
 interface PlayNavigationProps {
   onClick?: () => void;
+  isActive?: boolean;
 }
 
-function PlayNavigation({ onClick }: PlayNavigationProps) {
+function PlayNavigation({ onClick, isActive }: PlayNavigationProps) {
   const { startMatchmaking, inQueue } = useMatchmakingStore();
 
   const handleClick = () => {
@@ -22,7 +23,9 @@ function PlayNavigation({ onClick }: PlayNavigationProps) {
   return (
     <div className="px-6 pt-6">
       <button
-        className="text-[3rem] quicksand-bold bg-[#FDDB5B] text-[#3f3f3f] w-full p-1 border-2 border-[#795A3E] hover:bg-[#FFC105] rounded-xl"
+  className={`text-[3rem] quicksand-bold w-full p-1 border-2 border-[#795A3E] rounded-xl text-[#3f3f3f] 
+    ${isActive ? "bg-[#FFC105]" : "bg-[#FDDB5B]"} 
+    hover:bg-[#FFC105]`}
         onClick={handleClick}
         disabled={inQueue}
       >

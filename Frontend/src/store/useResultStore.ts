@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
+import { axiosInstance } from "../lib/axios";
 
 export interface Player {
   _id: string;
@@ -37,8 +38,8 @@ export const useResultStore = create<ResultStore>((set) => ({
   fetchResult: async (room_id) => {
     set({ loadingPlayers: true });
     try {
-      const res = await axios.get(
-        `http://localhost:3000/api/match-history/${room_id}`,
+      const res = await axiosInstance.get(
+        `/match-history/${room_id}`,
         { withCredentials: true }
       );
       const matchPlayers: Player[] = res.data?.players || [];
@@ -59,7 +60,7 @@ fetchPlayerHistory: async (room_id: string) => {
   try {
     console.log("Calling fetchPlayerHistory for room:", room_id);
     const res = await axios.get(
-      `http://localhost:3000/api/player-history/${room_id}`,
+      `/player-history/${room_id}`,
       { withCredentials: true }
     );
     const data = Array.isArray(res.data) ? res.data : [];

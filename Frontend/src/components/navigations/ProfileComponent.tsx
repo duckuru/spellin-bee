@@ -43,7 +43,7 @@ function ProfileComponent() {
               <img
                 src={
                   authUser.profilePic ||
-                  "https://img.daisyui.com/images/profile/demo/yellingcat@192.webp"
+                  "/Caught.png"
                 }
                 alt="avatar"
                 className="w-full h-full object-cover"

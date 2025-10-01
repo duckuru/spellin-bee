@@ -39,8 +39,6 @@ function GamePage() {
   const [myInput, setMyInput] = useState("");
   const [othersTyping, setOthersTyping] = useState<Record<string, string>>({});
 
-
-
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // --- Leave Room ---
@@ -131,7 +129,6 @@ function GamePage() {
         setTimeout(() => setLastAnswerResult(null), 1500);
       }
     };
-
 
     const handlePlayerLeftRoom = ({ userId, message }: any) => {
       toast(message);
@@ -259,7 +256,6 @@ function GamePage() {
     }
   };
 
-
   useEffect(() => {
     const handleTyping = ({ userId, text }: any) => {
       if (userId !== authUser?._id) {
@@ -273,7 +269,6 @@ function GamePage() {
       socket?.off("typing", handleTyping);
     };
   }, [socket, authUser]);
-
 
   const isCurrentUserTurn = authUser?._id === currentTurnPlayerId;
 
@@ -372,13 +367,10 @@ function GamePage() {
         : "bg-[#fddb6b]"
     }`}
           >
-
             {turnWord && currentTurnPlayerId ? (
               <div className="flex flex-col items-center justify-center gap-4 text-center">
                 <h2 className="text-6xl font-extrabold">
-                  {isCurrentUserTurn
-                    ? myInput
-                    : Object.values(othersTyping)[0]}
+                  {isCurrentUserTurn ? myInput : Object.values(othersTyping)[0]}
                 </h2>
                 {turnWord.definition && (
                   <p className="text-2xl max-w-[40rem]">
