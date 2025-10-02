@@ -12,6 +12,9 @@
 
 [✅] = User Profile Pic update with cloudinary
 [✅] = Ads sense
+[✅] = Change logo
+
+[❌?] = Responsive
 
 [❌] = Deploy
 [❌] = Poster
