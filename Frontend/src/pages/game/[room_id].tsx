@@ -32,6 +32,7 @@ function GamePage() {
   const [turnTimeLeft, setTurnTimeLeft] = useState<number>(0);
   const [preTurnCountdown, setPreTurnCountdown] = useState<number | null>(null);
 
+  const [lastWord, setLastWord] = useState<string | null>(null);
   const [lastAnswerResult, setLastAnswerResult] = useState<
     "correct" | "wrong" | null
   >(null);
@@ -99,7 +100,10 @@ function GamePage() {
       setTurnTimeLeft(turnTimeLeft ?? 20);
       setPreTurnCountdown(null);
 
-      if (word?.word) speakWord(word.word);
+      if (word?.word){
+        speakWord(word.word);
+        setLastWord(word.word); // store the word for later
+      } 
     };
 
     const handleTurnTimeUpdate = ({ playerId, timeLeft }: any) => {
@@ -108,6 +112,11 @@ function GamePage() {
 
     const handleTurnEnded = () => {
       setCurrentTurnPlayerId(null);
+
+      if (turnWord?.word) {
+        setLastWord(turnWord.word);
+      }
+
       setTurnWord(null);
       setTurnTimeLeft(0);
       setMyInput("");
@@ -212,7 +221,7 @@ function GamePage() {
       if (current <= 0) {
         clearInterval(interval);
         setPreTurnCountdown(null);
-        socket?.emit("startTurn", { room_id });
+        // socket?.emit("startTurn", { room_id });
       } else {
         setPreTurnCountdown(current);
       }
@@ -385,18 +394,16 @@ function GamePage() {
                     🔊
                   </button>
                 )}
-                {/* <h3 className="text-3xl">Time Left: {turnTimeLeft}s</h3>
-                <h3 className="text-2xl">
-                  Current Turn:{" "}
-                  {players.find((p) => p.userId === currentTurnPlayerId)
-                    ?.username || "Unknown"}
-                </h3> */}
               </div>
-            ) : (
-              <h1 className="text-3xl quicksand-bold">
-                Waiting for next turn...
-              </h1>
-            )}
+) : lastAnswerResult === "wrong" && lastWord ? (
+  <h1 className="text-3xl quicksand-bold text-white">
+    ❌ Correct answer: <span className="underline">{lastWord}</span>
+  </h1>
+) : (
+  <h1 className="text-3xl quicksand-bold">Waiting for next turn...</h1>
+)}
+
+
           </div>
 
           {/* Answer Input + Submit */}
@@ -411,6 +418,12 @@ function GamePage() {
               disabled={!isCurrentUserTurn}
               value={myInput}
               onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && isCurrentUserTurn) {
+                  e.preventDefault(); // prevents accidental form submit/refresh
+                  handleSubmitAnswer();
+                }
+              }}
             />
             <button
               className={`bg-[#F5AF36] text-[#f3f3f3] rounded-lg h-14 w-40 text-2xl font-bold border-2 border-[#795A3E] ${

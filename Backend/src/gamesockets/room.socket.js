@@ -149,7 +149,7 @@ async function startTurnForRoom(io, room_id) {
 
 function ensureTurnInterval(io, room_id) {
   if (roomIntervals.has(room_id)) return;
-
+  clearRoomInterval(room_id);
   const tick = async () => {
     const redisKey = `room:${room_id}`;
     const str = await redis.get(redisKey);
