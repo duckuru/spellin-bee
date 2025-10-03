@@ -29,53 +29,55 @@ function ProfileComponent() {
 
   if (!authUser) return null;
   return (
-            <div className="relative" ref={dropdownRef}>
-          <button
-            className={`flex items-center gap-4 p-3 rounded-xl border-2 transition-colors text-3xl font-bold quicksand-bold bg-transparent text-[#3f3f3f] shadow-none ${
-              dropdownOpen
-                ? "bg-[#ffe08d] border-[#795a3e]"
-                : "border-[#795a3e] hover:bg-[#ffe08d]"
-            }`}
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-          >
-            <span>{authUser.username}</span>
-            <div className="w-12 h-12 rounded-full overflow-hidden relative">
-              <img
-                src={
-                  authUser.profilePic ||
-                  "/Caught.png"
-                }
-                alt="avatar"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span
-              className={`absolute top-3 right-4 w-3 h-3 rounded-full border-2 border-white ${
-                authUser ? "bg-green-500" : "bg-gray-400"
-              }`}
-            ></span>
-          </button>
-
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-44 bg-transparent border-2 border-[#795a3e] rounded-xl shadow-lg overflow-hidden z-50">
-              <button
-                className="flex items-center gap-2 w-full px-4 py-2 text-[#3f3f3f] text-xl font-bold hover:bg-[#ffe08d] rounded-xl transition-colors"
-                onClick={handleGoProfile}
-              >
-                <UserIcon className="w-5 h-5" />
-                Profile
-              </button>
-              <button
-                className="flex items-center gap-2 w-full px-4 py-2 text-[#3f3f3f] text-xl font-bold hover:bg-[#ffe08d] rounded-xl transition-colors"
-                onClick={logout}
-              >
-                <LogOutIcon className="w-5 h-5" />
-                Logout
-              </button>
-            </div>
-          )}
+    <div className="relative" ref={dropdownRef}>
+      <button
+        className={`flex items-center gap-[clamp(0.5rem,1vw,1rem)] p-[clamp(0.5rem,1vw,0.75rem)] rounded-xl border-2 transition-colors text-3xl font-bold quicksand-bold bg-transparent text-[#3f3f3f] shadow-none z-50 ${
+          dropdownOpen
+            ? "bg-[#ffe08d] border-[#795a3e]"
+            : "border-[#795a3e] hover:bg-[#ffe08d]"
+        }`}
+        onClick={() => setDropdownOpen(!dropdownOpen)}
+      >
+        <span className="text-[clamp(1.9rem,1.2vw,2.5rem)]">
+          {" "}
+          {authUser.username.length > 8
+            ? authUser.username.slice(0, 8) + ""
+            : authUser.username}{" "}
+        </span>
+        <div className="w-[clamp(2.5rem,4vw,3rem)] h-[clamp(2.5rem,4vw,3rem)] rounded-full overflow-hidden relative border-2">
+          <img
+            src={authUser.profilePic || "/Caught.png"}
+            alt="avatar"
+            className="w-full h-full object-cover"
+          />
         </div>
-  )
+        <span
+          className={`absolute top-3 right-4 w-3 h-3 rounded-full border-2 border-white ${
+            authUser ? "bg-green-500" : "bg-gray-400"
+          }`}
+        ></span>
+      </button>
+
+      {dropdownOpen && (
+        <div className="absolute right-0 mt-2 w-44 bg-transparent border-2 border-[#795a3e] rounded-xl shadow-lg overflow-hidden z-50">
+          <button
+            className="flex items-center gap-2 w-full px-4 py-2 text-[#3f3f3f] text-xl font-bold hover:bg-[#ffe08d] rounded-xl transition-colors"
+            onClick={handleGoProfile}
+          >
+            <UserIcon className="w-5 h-5" />
+            Profile
+          </button>
+          <button
+            className="flex items-center gap-2 w-full px-4 py-2 text-[#3f3f3f] text-xl font-bold hover:bg-[#ffe08d] rounded-xl transition-colors"
+            onClick={logout}
+          >
+            <LogOutIcon className="w-5 h-5" />
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default ProfileComponent

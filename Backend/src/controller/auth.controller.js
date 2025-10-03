@@ -137,23 +137,40 @@ export const logout = (_, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const {profilePic} = req.body;
+    const { profilePic } = req.body;
 
-    if(!profilePic) return res.status(400).json({message: "Profile Picutre is Require"});
+    if (!profilePic)
+      return res.status(400).json({ message: "Profile Picture is required" });
 
     const userId = req.user._id;
+    let finalProfilePic = profilePic;
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic)
+    // If the image is Base64 (user-uploaded), upload to Cloudinary
+    if (profilePic.startsWith("data:image")) {
+      try {
+        const uploadResponse = await cloudinary.uploader.upload(profilePic);
+        finalProfilePic = uploadResponse.secure_url;
+      } catch (err) {
+        console.error("Cloudinary upload error:", err);
+        return res.status(500).json({ message: "Failed to upload image" });
+      }
+    }
 
-    const updatedUserProfile = await User.findByIdAndUpdate(userId, {profilePic:uploadResponse.secure_url}, {new: true});
+    // If profilePic is already a URL or relative path, just save it
+    const updatedUserProfile = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: finalProfilePic },
+      { new: true }
+    );
 
-    res.status(200).json(updatedUserProfile);
-
+    const { password, ...safeUser } = updatedUserProfile._doc;
+    res.status(200).json(safeUser);
   } catch (error) {
-    console.log("Error in update profile:", error)
+    console.log("Error in update profile:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
 
 export const checkAuth = async (req, res) => {
   try {

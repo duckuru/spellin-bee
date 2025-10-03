@@ -35,7 +35,6 @@ export default function MainContent() {
   // Fetch leaderboard when mode is leaderboard
   useEffect(() => {
     if (mode !== "leaderboard") return;
-
     axiosInstance
       .get("/leaderboard")
       .then((res) => {
@@ -51,6 +50,10 @@ export default function MainContent() {
     if (!roomInput) return;
     navigate(`/lobby/${roomInput}`);
   };
+
+  const handleFullLeaderboard = () =>{
+    navigate("/leaderboard");
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -108,7 +111,7 @@ export default function MainContent() {
       <div className="w-[60rem] bg-[#FDDB5B] border-[#795A3E] border-2 relative rounded-2xl">
         {inQueue && (
           <div className="absolute top-6 left-1/2 transform -translate-x-1/2">
-            <Matchmaking stopMatchmaking={() => setActiveNav(null)}/>
+            <Matchmaking stopMatchmaking={() => setActiveNav(null)} />
           </div>
         )}
 
@@ -137,83 +140,104 @@ export default function MainContent() {
           )}
 
           {mode === "leaderboard" && (
-            <div className="flex flex-col w-full h-full rounded text-[#795A3E] p-8">
-              {/* Title */}
-              <h1 className="text-6xl sour-gummy-bold mb-8 text-center">
-                Leaderboard
-              </h1>
-
-              {/* Table wrapper */}
-              <div className="flex-1 relative">
-                <table className="w-full table-fixed border-collapse">
-                  {/* Header */}
-                  <thead className="bg-[#FDDB5B] z-10">
-                    <tr className="text-[2.5rem] sour-gummy-bold">
-                      <th className="w-[30%] py-4 px-6 text-left">No</th>
-                      <th className="w-[40%] py-4 px-6 text-center">
-                        Username
-                      </th>
-                      <th className="w-[30%] py-4 px-6 text-center">
-                        Rank (MMR)
-                      </th>
-                    </tr>
-                  </thead>
-                </table>
-
-                {/* Scrollable body */}
-                <div
-                  className="max-h-[19rem] overflow-y-auto"
-                  ref={scrollRef}
-                  onScroll={updatePinnedState}
+            <div>
+              <div className="relative">
+                <button
+                  className="absolute px-2 py-3 top-2 right-0 border-2 text-xl rounded-xl quicksand-bold hover:bg-[#F5AF36] cursor-pointer"
+                  onClick={handleFullLeaderboard}
                 >
-                  <table className="w-full table-fixed border-collapse">
-                    <tbody className="">
-                      {(Array.isArray(leaderboard) ? leaderboard : []).map(
-                        (user, idx) => (
-                          <tr
-                            key={user.userId}
-                            ref={
-                              user.userId === authUser?.userId
-                                ? authUserRef
-                                : null
-                            }
-                            className={`text-[2.5rem] sour-gummy-semi ${
-                              user.userId === authUser?.userId
-                                ? "text-[#2E74F5]"
-                                : ""
-                            }`}
-                          >
-                            <td className="w-[30%] px-6 text-left">
-                              {idx + 1}
-                            </td>
-                            <td className="w-[40%] px-6 text-center">
-                              {user.userId === authUser?.userId
-                                ? `${authUser.username} (You)`
-                                : user.username}
-                            </td>
-                            <td className="w-[30%] px-6 text-center">
-                              {user.mmr}
-                            </td>
-                          </tr>
-                        )
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                  Full Leaderboard
+                </button>
               </div>
+              <div className="flex flex-col w-full h-full rounded text-[#795A3E] p-8">
+                {/* Title */}
+                <h1 className="text-6xl sour-gummy-bold mb-8 text-center">
+                  Leaderboard
+                </h1>
 
-              {/* Pinned auth user */}
-              {authUser && isPinned && (
-                <div className="flex justify-between px-6 text-[#2E74F5] sticky bottom-0 text-[2.5rem] sour-gummy-semi">
-                  <span>
-                    {(leaderboard?.findIndex(
-                      (u) => u.userId === authUser.userId
-                    ) ?? leaderboard.length) + 1}
-                  </span>
-                  <span>{authUser.username} (You)</span>
-                  <span>{authUser.mmr}</span>
+                {/* Table wrapper */}
+                <div className="flex-1 relative">
+                  <table className="w-full table-fixed border-collapse">
+                    {/* Header */}
+                    <thead className="bg-[#FDDB5B] z-10">
+                      <tr className="text-[2.5rem] sour-gummy-bold">
+                        <th className="w-[30%] py-4 px-6 text-left">No</th>
+                        <th className="w-[40%] py-4 px-6 text-center">
+                          Username
+                        </th>
+                        <th className="w-[30%] py-4 px-6 text-center">
+                          Rank (MMR)
+                        </th>
+                      </tr>
+                    </thead>
+                  </table>
+
+                  {/* Scrollable body */}
+                  <div
+                    className="max-h-[19rem] overflow-y-auto"
+                    ref={scrollRef}
+                    onScroll={updatePinnedState}
+                  >
+                    <table className="w-full table-fixed border-collapse">
+                      <tbody className="">
+                        {(Array.isArray(leaderboard) ? leaderboard : []).map(
+                          (user, idx) => (
+                            <tr
+                              key={user.userId}
+                              ref={
+                                user.userId === authUser?.userId
+                                  ? authUserRef
+                                  : null
+                              }
+                              className={`text-[2.5rem] sour-gummy-semi ${
+                                user.userId === authUser?.userId
+                                  ? "text-[#2E74F5]"
+                                  : ""
+                              }`}
+                            >
+                              <td className="w-[30%] px-6 text-left">
+                                {idx + 1}
+                              </td>
+                              <td className="w-[40%] px-6 text-center">
+                                {user.userId === authUser?.userId
+                                  ? `${
+                                      authUser.username.length > 8
+                                        ? authUser.username.slice(0, 8) + "…"
+                                        : authUser.username
+                                    } (You)`
+                                  : user.username.length > 8
+                                  ? user.username.slice(0, 8) + "…"
+                                  : user.username}
+                              </td>
+                              <td className="w-[30%] px-6 text-center">
+                                {user.mmr}
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              )}
+
+                {/* Pinned auth user */}
+                {authUser && isPinned && (
+                  <div className="flex justify-between px-6 text-[#2E74F5] sticky bottom-0 text-[2.5rem] sour-gummy-semi">
+                    <span className="w-[30%] text-start">
+                      {(leaderboard?.findIndex(
+                        (u) => u.userId === authUser.userId
+                      ) ?? leaderboard.length) + 1}
+                    </span>
+                    <span className="w-[40%]">
+                      {authUser.username.length > 8
+                        ? authUser.username.slice(0, 8) + "…"
+                        : authUser.username}{" "}
+                      (You)
+                    </span>
+                    <span className="w-[30%]">{authUser.mmr}</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

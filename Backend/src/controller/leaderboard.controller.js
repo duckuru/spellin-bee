@@ -22,7 +22,9 @@ export const getLeaderboardSorted = async (req, res) => {
       return {
         userId: u._id,
         username: u.username,
-        mmr: data?.mmr || 0
+        profilePic: u.profilePic,
+        mmr: data?.mmr || 0,
+        rank: data?.rank || "Bronze I"
       };
     });
 

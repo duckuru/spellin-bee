@@ -13,6 +13,7 @@ import ResultPage from './pages/result/[result_id]';
 import ProfilePage from './pages/ProfilePage';
 import LobbyPage from './pages/CreateLobbyPage';
 import AdBanner from './components/ads/AdsSense';
+import Leaderboard from './pages/Leaderboard';
 
 
 function App() {
@@ -33,10 +34,14 @@ function App() {
   return (
     <div className="min-h-screen overflow-hidden flex flex-col bg-gradient-to-b from-[#ffe397] to-[#f3f3f3] quicksand-bold">
       <HexagonBackground colorsProp={colors} />
-      <div className="absolute top-[2rem] w-full flex items-center justify-between px-[3rem] sm:px-6 md:px-12 z-20">
-        <div className="flex items-center justify-center flex-1 gap-4">
-          <img src="/logoSB4.png" alt="Spelling Bee" className="w-32 h-32" />
-          <h1 className="text-[6.5rem] text-[#FFC105] sour-gummy-bold">
+      <div className="absolute top-[2rem] w-full flex items-center justify-center px-[3rem] z-20">
+        <div className="flex items-center  gap-4">
+          <img
+            src="/logoSB4.png"
+            alt="Spelling Bee"
+            className="w-[clamp(4rem,6.8vw,12rem)] h-[clamp(4rem,6.8vw,12rem)]"
+          />
+          <h1 className="text-[clamp(3rem,6vw,6.5rem)] text-[#FFC105] sour-gummy-bold">
             <span className="text-[#FFC105]">SPELLIN</span>
             <span className="text-[#795a3e]">-BEE</span>
           </h1>
@@ -63,6 +68,10 @@ function App() {
         <Route
           path="/profile"
           element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
+        ></Route>
+        <Route
+          path="/leaderboard"
+          element={authUser ? <Leaderboard /> : <Navigate to={"/login"} />}
         ></Route>
         <Route
           path="/lobby/:room_id?"

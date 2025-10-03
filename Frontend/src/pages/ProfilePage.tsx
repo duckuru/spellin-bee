@@ -6,6 +6,19 @@ import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import PageLoader from "../components/PageLoader";
 
+const predefinedImages = [
+  "/images/cataware.png",
+  "/images/catpointing.png",
+  "/images/cookeddog.png",
+  "/images/copium.png",
+  "/images/damn.png",
+  "/images/dogpointing.png",
+  "/images/fatfk.png",
+  "/images/gigachad.png",
+  "/images/kekw.png",
+  "/images/xdd.png",
+];
+
 function ProfilePage() {
   const {
     myMatches,
@@ -27,23 +40,37 @@ function ProfilePage() {
   const myAuthUserId = authUser?._id;
   const fileInput = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [avatarPopupOpen, setAvatarPopupOpen] = useState(false);
 
-const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  const reader = new FileReader()
-  reader.readAsDataURL(file);
 
-  reader.onloadend = async () => {
-    const base64Image = reader.result as string; 
-    setSelectedImage(base64Image)
-    await updateProfile({profilePic:base64Image});
-  }
-};
+  const handleSelectImage = async (img: string) => {
+    setSelectedImage(img);
+    await updateProfile({ profilePic: img });
+    setAvatarPopupOpen(false);
+  };
+
+  const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result as string;
+      setSelectedImage(base64Image);
+      await updateProfile({ profilePic: base64Image });
+      setAvatarPopupOpen(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
 
   useEffect(() => {
-    if (view === "matches") fetchMyMatches();
-    if (view === "history") fetchMyHistory();
+    if (view === "matches"){
+      fetchMyMatches();
+      setAvatarPopupOpen(false);
+    }else if (view === "history"){
+      fetchMyHistory()
+      setAvatarPopupOpen(false);
+    };
   }, [view, fetchMyMatches, fetchMyHistory]);
 
   const handleBack = () => {
@@ -89,62 +116,83 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
           </button>
         </div>
 
-{view === "profile" && authUser && (
-<>
-  <h1 className="text-2xl quicksand-bold mb-2">My Profile</h1>
+        {view === "profile" && authUser && (
+          <>
+            <h1 className="text-2xl quicksand-bold mb-2">My Profile</h1>
 
-  <div className="flex flex-col items-start gap-6 py-6 relative">
-    {/* Show loader overlay if updating */}
-    {isUpdatingProfileImage && (
-      <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded">
-        <PageLoader />
-      </div>
-    )}
+            <div className="flex flex-col items-start gap-6 py-6 relative">
+              {/* Show loader overlay if updating */}
+              {isUpdatingProfileImage && (
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded">
+                  <PageLoader />
+                </div>
+              )}
 
-    {/* Profile Picture */}
-    <div className="flex flex-row items-center gap-4">
-      <div className="avatar relative">
-        <div className="w-16 h-16 rounded-full avatar-online group">
-          <button
-            className="w-full h-full rounded-full overflow-hidden"
-            onClick={() => fileInput.current?.click()}
-          >
-            <img
-              src={selectedImage || authUser.profilePic || "/Caught.png"}
-              alt="avatar"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-full">
-              <span className="text-[#f3f3f3] text-xs">Change</span>
+              {/* Profile Picture */}
+              <div className="flex flex-row items-center gap-4">
+                <div className="avatar relative">
+                  <div className="w-16 h-16 rounded-full avatar-online group ">
+                    <button
+                      className="w-full h-full rounded-full overflow-hidden"
+                      onClick={() => setAvatarPopupOpen(true)}
+                    >
+                      <img
+                        src={
+                          selectedImage || authUser.profilePic || "/Caught.png"
+                        }
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-full">
+                        <span className="text-[#f3f3f3] text-xs">Change</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                {avatarPopupOpen && (
+                  <div className="absolute top-full mt-2 w-72 bg-white border-2 border-[#795A3E] rounded-xl shadow-lg p-4 grid grid-cols-5 gap-2 z-50">
+                    {predefinedImages.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img}
+                        alt={`avatar-${idx}`}
+                        className="w-12 h-12 object-cover rounded-full cursor-pointer hover:ring-2 hover:ring-[#795A3E]"
+                        onClick={() => handleSelectImage(img)}
+                      />
+                    ))}
+                    <label className="col-span-5 mt-2 cursor-pointer px-2 py-1 bg-[#FDDB5B] rounded-lg text-center hover:bg-[#F0C419]">
+                      Upload Your Own
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleUploadImage}
+                      />
+                    </label>
+                  </div>
+                )}
+
+                <div className="flex flex-col">
+                  <h2 className="text-3xl quicksand-bold text-[#3f3f3f]">
+                    {authUser.username}
+                  </h2>
+                  <p className="text-xl text-[#3f3f3f]">{authUser.email}</p>
+                </div>
+              </div>
+
+              {/* Rank & MMR */}
+              <div className="flex flex-col gap-4">
+                <span className="text-[#3f3f3f] text-2xl">
+                  Rank: {userData?.rank}
+                </span>
+                <span className="text-[#3f3f3f] text-2xl">
+                  MMR: {userData?.mmr}
+                </span>
+              </div>
             </div>
-          </button>
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInput}
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col">
-        <h2 className="text-3xl quicksand-bold text-[#3f3f3f]">
-          {authUser.username}
-        </h2>
-        <p className="text-xl text-[#3f3f3f]">{authUser.email}</p>
-      </div>
-    </div>
-
-    {/* Rank & MMR */}
-    <div className="flex flex-col gap-4">
-        <span className="text-[#3f3f3f] text-2xl">Rank: {userData?.rank}</span>
-        <span className="text-[#3f3f3f] text-2xl">MMR: {userData?.mmr}</span>
-    </div>
-  </div>
-  </>
-)}
-
+          </>
+        )}
 
         {view === "matches" && (
           <>
