@@ -38,7 +38,7 @@ const ResultPage: React.FC = () => {
   const heights: Record<number, string> = { 1: "35rem", 2: "28rem", 3: "21rem" };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 pt-12 text-[#3f3f3f] z-50 overflow-hidden">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 pt-32 text-[#3f3f3f] z-50 overflow-hidden">
       <div className="relative w-[70rem] bg-[#f3f3f3] rounded-xl border-2 border-[#795A3E] h-[45rem] flex items-end justify-center">
         <button
           onClick={() => setShowPopup(true)}
@@ -53,7 +53,11 @@ const ResultPage: React.FC = () => {
               key={player._id}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: heights[player.rank!] || "20rem", opacity: 1 }}
-              transition={{ duration, delay: delays[player.rank!] || 0, ease: "easeOut" }}
+              transition={{
+                duration,
+                delay: delays[player.rank!] || 0,
+                ease: "easeOut",
+              }}
               className="w-48 bg-[#ffc105] rounded-t-xl flex flex-col items-center justify-center shadow-lg relative"
             >
               <div className="absolute -top-24 flex flex-col items-center">
@@ -62,9 +66,21 @@ const ResultPage: React.FC = () => {
                   className="text-6xl"
                   style={{ color: crownColors[player.rank!] || "#888" }}
                 />
-                <p className="quicksand-semi text-3xl">{player.username}</p>
+                <span
+                  className={
+                    authUser?.username === player.username
+                      ? "text-blue-500 sour-gummy-semi text-3xl"
+                      : "text-[#3f3f3f] sour-gummy-semi text-3xl"
+                  }
+                >
+                  {player.username}
+                </span>
                 <div className="quicksand-semi mt-2 text-4xl">
-                  {player.rank === 1 ? "1st" : player.rank === 2 ? "2nd" : "3rd"}
+                  {player.rank === 1
+                    ? "1st"
+                    : player.rank === 2
+                    ? "2nd"
+                    : "3rd"}
                 </div>
               </div>
 
@@ -72,7 +88,11 @@ const ResultPage: React.FC = () => {
                 className="absolute top-1/2 -translate-y-1/2 text-3xl font-bold flex flex-col items-center justify-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: delays[player.rank!] || 0, ease: "easeOut" }}
+                transition={{
+                  duration: 0.8,
+                  delay: delays[player.rank!] || 0,
+                  ease: "easeOut",
+                }}
               >
                 Points
                 <div>{player.score}</div>
@@ -83,7 +103,7 @@ const ResultPage: React.FC = () => {
       </div>
 
       {showPopup && userId && room_id && (
-        <ResultPopup onClose={() => setShowPopup(false)} room_id={room_id}/>
+        <ResultPopup onClose={() => setShowPopup(false)} room_id={room_id} />
       )}
     </div>
   );

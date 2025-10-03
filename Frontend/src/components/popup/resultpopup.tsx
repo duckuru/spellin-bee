@@ -22,19 +22,20 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
   const [playerHistory, setPlayerHistory] = useState<PlayerHistoryItem[]>([]);
   const [loadingPlayerHistory, setLoadingPlayerHistory] = useState(false);
 
-  const { authUser } = useAuthStore();
+  const { authUser, userData } = useAuthStore();
   const userId = authUser?._id;
-
+  
   const navigate = useNavigate();
-
+  
   // Zustand store for match result
   const { players, loadingPlayers, fetchResult } = useResultStore();
-
+  
   // Fetch player history with axios directly
   useEffect(() => {
     const fetchPlayerHistory = async () => {
       if (!room_id || !userId) return;
-
+      
+      if (!authUser) return;
       setLoadingPlayerHistory(true);
       try {
         const res = await axios.get(
@@ -51,10 +52,10 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
     };
 
     if (activeTab === "match") {
-      console.log("Fetching match history from store for room:", room_id);
+      // console.log("Fetching match history from store for room:", room_id);
       fetchResult(room_id);
     } else if (activeTab === "player") {
-      console.log("Fetching player history for user:", userId, "in room:", room_id);
+      // console.log("Fetching player history for user:", userId, "in room:", room_id);
       fetchPlayerHistory();
     }
   }, [activeTab, room_id, userId, fetchResult]);
@@ -65,8 +66,14 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50" onClick={handleClose}>
-      <div className="bg-white rounded-xl w-3/4 max-w-4xl p-6 relative " onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 bg-black/50"
+      onClick={handleClose}
+    >
+      <div
+        className="bg-white rounded-xl w-3/4 max-w-4xl p-6 relative "
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 text-xl font-bold hover:text-red-500"
@@ -80,7 +87,9 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
             type="button"
             onClick={() => setActiveTab("match")}
             className={`px-4 py-2 font-semibold ${
-              activeTab === "match" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"
+              activeTab === "match"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-500"
             }`}
           >
             Match History
@@ -89,7 +98,9 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
             type="button"
             onClick={() => setActiveTab("player")}
             className={`px-4 py-2 font-semibold ${
-              activeTab === "player" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"
+              activeTab === "player"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-500"
             }`}
           >
             Player Results
@@ -106,11 +117,22 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
               <div className="mb-4 p-4 border rounded-lg bg-gray-50">
                 <ul className="mt-2">
                   {players.map((p) => (
-                    <li key={p._id} className="flex justify-between border-b py-1">
-                      <span>{p.username}</span>
-                      <span>
-                        {p.score} pts (Rank {p.rank})
+                    <li
+                      key={p._id}
+                      className="flex justify-between border-b py-1 sour-gummy-bold text-3xl"
+                    >
+                      <span>#{p.rank}</span>
+
+                      <span
+                        className={
+                          authUser?.username === p.username
+                            ? "text-blue-500"
+                            : "text-[#3f3f3f]"
+                        }
+                      >
+                        {p.username}
                       </span>
+                      <span>{p.score} pts</span>
                     </li>
                   ))}
                 </ul>
@@ -126,10 +148,31 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
               <p>Loading player history...</p>
             ) : playerHistory.length > 0 ? (
               playerHistory.map((item, idx) => (
-                <div key={idx} className="mb-4 p-4 border rounded-lg bg-gray-50">
-                  <p className="font-bold">{item.username}</p>
+                <div
+                  key={idx}
+                  className="mb-4 p-4 border rounded-lg bg-gray-50 sour-gummy-bold text-3xl"
+                >
+                  <p>
+                    Username:{" "}
+                    <span className="text-blue-500">{item.username}</span>
+                  </p>
                   <p>Points: {item.points}</p>
-                  <p>MMR Change: {item.mmrChange}</p>
+                  <p>
+                    MMR Change: <span>{userData?.mmr}</span>{" "}
+                    <span
+                      className={
+                        item.mmrChange < 0
+                          ? "text-red-500 font-semibold"
+                          : item.mmrChange > 0
+                          ? "text-green-500 font-semibold"
+                          : "text-gray-500 font-semibold"
+                      }
+                    >
+                      ({item.mmrChange > 0
+                        ? `+${item.mmrChange}`
+                        : item.mmrChange})
+                    </span>
+                  </p>
                   <p>Rank: {item.rank}</p>
                 </div>
               ))

@@ -35,7 +35,7 @@ function App() {
       <HexagonBackground colorsProp={colors} />
       <div className="absolute top-[2rem] w-full flex items-center justify-between px-[3rem] sm:px-6 md:px-12 z-20">
         <div className="flex items-center justify-center flex-1 gap-4">
-          <img src="/logoSB.png" alt="Spelling Bee" className="w-32 h-32" />
+          <img src="/logoSB4.png" alt="Spelling Bee" className="w-32 h-32" />
           <h1 className="text-[6.5rem] text-[#FFC105] sour-gummy-bold">
             <span className="text-[#FFC105]">SPELLIN</span>
             <span className="text-[#795a3e]">-BEE</span>
