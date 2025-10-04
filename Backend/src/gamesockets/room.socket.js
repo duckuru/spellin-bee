@@ -7,18 +7,22 @@ import {
   updateRoomStatusDBPublic,
 } from "../controller/room.controller.js";
 import redis from "../redis/client.js";
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import axios from "axios";
 import { saveMatchandPlayerHistory } from "../controller/history.controller.js";
 
-// Get the current file's directory
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ESM __dirname fix
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Construct the absolute path to words.json
-const wordsFilePath = path.join(__dirname, 'word', 'words.json'); // because this file is in src/
 
+// Construct absolute path to words.json
+// Your file is in Backend/src/word/words.json
+const wordsFilePath = path.join(__dirname, '..', 'word', 'words.json');
+
+// Read the file
 const wordsData = JSON.parse(fs.readFileSync(wordsFilePath, 'utf-8'));
 
 // --- In-memory maps for timers ---
