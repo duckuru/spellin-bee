@@ -11,7 +11,7 @@ import { app, server } from "./lib/socket.js";
 // const app = express();
 const __dirname = path.resolve();
 
-const PORT = ENV.PORT || 3000;
+const PORT = ENV.PORT;
 
 // app.use(express.json());
 app.use(express.json({ limit: '10mb' }));
