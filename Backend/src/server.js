@@ -23,14 +23,16 @@ app.use("/api/auth", authRoutes);
 app.use("/api", resultRoutes);
 
 
-if (ENV.NODE_ENV == "production") {
-  app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+const frontendPath = path.resolve("Frontend/dist"); // relative to project root
+
+if (ENV.NODE_ENV === "production") {
+  app.use(express.static(frontendPath));
 
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+    res.sendFile(path.join(frontendPath, "index.html"));
   });
-
 }
+
 
 
 
