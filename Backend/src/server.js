@@ -33,12 +33,12 @@ if (ENV.NODE_ENV == "production") {
 }
 
 
-// Start server and connect DB
 server.listen(PORT, async () => {
   console.log("Server running on port:", PORT);
   try {
     await connectDB();
   } catch (err) {
-    console.error("Database connection error:", err);
+    console.error("Failed to connect DB:", err);
+    process.exit(1); // stops server if DB fails
   }
 });
