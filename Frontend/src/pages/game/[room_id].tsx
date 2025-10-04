@@ -5,7 +5,6 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate, useParams } from "react-router";
 import toast from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
 
 interface Player {
   userId: string;
@@ -36,7 +35,7 @@ function GamePage() {
   const [lastAnswerResult, setLastAnswerResult] = useState<
     "correct" | "wrong" | null
   >(null);
-  const [liveInput, setLiveInput] = useState<string>("");
+  // const [liveInput, setLiveInput] = useState<string>("");
   const [myInput, setMyInput] = useState("");
   const [othersTyping, setOthersTyping] = useState<Record<string, string>>({});
 

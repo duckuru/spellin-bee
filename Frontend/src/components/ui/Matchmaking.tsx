@@ -15,7 +15,7 @@ export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
     "Matchmaking...",
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { leaveQueue, queuePlayers, currentQueueLength } = useMatchmakingStore();
+  const { leaveQueue, currentQueueLength } = useMatchmakingStore();
 
   useEffect(() => {
     const interval = setInterval(() => {

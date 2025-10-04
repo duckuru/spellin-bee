@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import ProfileComponent from "../components/navigations/ProfileComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -38,7 +38,7 @@ function ProfilePage() {
     "profile"
   );
   const myAuthUserId = authUser?._id;
-  const fileInput = useRef<HTMLInputElement>(null);
+  // const fileInput = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [avatarPopupOpen, setAvatarPopupOpen] = useState(false);
 
