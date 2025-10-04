@@ -23,12 +23,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api", resultRoutes);
 
 
-if (ENV.NODE_ENV === "production") {
-  const frontendDist = path.join(__dirname, "frontend/dist");
-  app.use(express.static(frontendDist));
+if (ENV.NODE_ENV == "production") {
+  app.use(express.static(path.join(__dirname, "frontend/dist")));
 
   app.get("*", (req, res) => {
-    res.sendFile(path.join(frontendDist, "index.html"));
+    res.sendFile(path.join(__dirname, "frontend/dist", "index.html"));
   });
 }
 
