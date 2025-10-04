@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { useResultStore } from "../../store/useResultStore";
+import { axiosInstance } from "../../lib/axios";
 
 interface PlayerHistoryItem {
   username: string;
@@ -38,8 +39,8 @@ const ResultPopup: React.FC<ResultPopupProps> = ({ onClose, room_id }) => {
       if (!authUser) return;
       setLoadingPlayerHistory(true);
       try {
-        const res = await axios.get(
-          `http://localhost:3000/api/player-history/${room_id}/${userId}`,
+        const res = await axiosInstance.get(
+          `/player-history/${room_id}/${userId}`,
           { withCredentials: true }
         );
         setPlayerHistory(Array.isArray(res.data) ? res.data : []);
