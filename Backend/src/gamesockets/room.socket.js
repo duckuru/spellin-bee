@@ -10,9 +10,9 @@ import redis from "../redis/client.js";
 import fs from "fs";
 import axios from "axios";
 import { saveMatchandPlayerHistory } from "../controller/history.controller.js";
-import UserData from "../models/Userdata.js";
 
-const wordsData = JSON.parse(fs.readFileSync("./src/word/words.json", "utf8"));
+const wordsFilePath = path.join(__dirname, '../word/words.json'); // adjust based on file location
+const wordsData = JSON.parse(fs.readFileSync(wordsFilePath, 'utf-8'));
 
 // --- In-memory maps for timers ---
 const roomIntervals = new Map(); // { room_id -> intervalId }
