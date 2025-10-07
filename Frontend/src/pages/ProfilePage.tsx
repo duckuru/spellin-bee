@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import PageLoader from "../components/PageLoader";
+import toast from "react-hot-toast";
 
 const predefinedImages = [
   "/images/cataware.png",
@@ -52,6 +53,13 @@ function ProfilePage() {
   const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const validTypes = ["image/png", "image/jpeg"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Please upload only PNG or JPG images.");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64Image = reader.result as string;
@@ -165,7 +173,7 @@ function ProfilePage() {
                       Upload Your Own
                       <input
                         type="file"
-                        accept="image/*"
+                        accept=".png, .jpg, .jpeg"
                         className="hidden"
                         onChange={handleUploadImage}
                       />

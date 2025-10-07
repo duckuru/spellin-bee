@@ -16,7 +16,7 @@
 
 [❌?] = Responsive
 
-[❌] = Deploy
+[✅] = Deploy
 [❌] = Poster
 [❌] = Doc
 [❌] = Timeline
