@@ -5,6 +5,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate, useParams } from "react-router";
 import toast from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
+import { axiosInstance } from "../../lib/axios";
 
 interface Player {
   userId: string;
@@ -34,7 +35,9 @@ function GamePage() {
   const [preTurnCountdown, setPreTurnCountdown] = useState<number | null>(null);
 
   const [lastWord, setLastWord] = useState<string | null>(null);
-  const [lastWordDefinition, setLastWordDefinition] = useState<string | null>(null);
+  const [lastWordDefinition, setLastWordDefinition] = useState<string | null>(
+    null
+  );
   const [lastAnswerResult, setLastAnswerResult] = useState<
     "correct" | "wrong" | null
   >(null);
@@ -43,6 +46,8 @@ function GamePage() {
   const [othersTyping, setOthersTyping] = useState<Record<string, string>>({});
 
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const [totalRound, setTotalRound] = useState<number | null>(null);
 
   // --- Leave Room ---
   const handleLeaveRoom = () => {
@@ -103,12 +108,14 @@ function GamePage() {
       setPreTurnCountdown(null);
 
       // Reset lastAnswerCorrect for all players
-      setPlayers((prev) => prev.map((p) => ({ ...p, lastAnswerCorrect: null })));
-      
-      if (word?.word){
+      setPlayers((prev) =>
+        prev.map((p) => ({ ...p, lastAnswerCorrect: null }))
+      );
+
+      if (word?.word) {
         speakWord(word.word);
         setLastWord(word.word); // store the word for later
-      } 
+      }
     };
 
     const handleTurnTimeUpdate = ({ playerId, timeLeft }: any) => {
@@ -127,6 +134,7 @@ function GamePage() {
       setTurnTimeLeft(0);
       setMyInput("");
       setOthersTyping({});
+
     };
 
     const handleScoreUpdate = (scores: Record<string, number>) => {
@@ -135,19 +143,16 @@ function GamePage() {
       );
     };
 
-const handleAnswerResult = ({ isCorrect, word, typedWord }: any) => {
-  setLastWord(isCorrect ? typedWord : word);
-  setLastWordDefinition(word.definition);
-  setLastAnswerResult(isCorrect ? "correct" : "wrong");
+    const handleAnswerResult = ({ isCorrect, word, typedWord }: any) => {
+      setLastWord(isCorrect ? typedWord : word);
+      setLastWordDefinition(word.definition);
+      setLastAnswerResult(isCorrect ? "correct" : "wrong");
 
-  setTimeout(() => {
-    setLastAnswerResult(null);
-    setLastWord(null);
-  }, 2500);
-};
-
-
-
+      setTimeout(() => {
+        setLastAnswerResult(null);
+        setLastWord(null);
+      }, 2500);
+    };
 
     const handlePlayerLeftRoom = ({ userId, message }: any) => {
       toast(message);
@@ -218,6 +223,21 @@ const handleAnswerResult = ({ isCorrect, word, typedWord }: any) => {
       socket.off("roomError", handleRoomError);
     };
   }, [socket, authUser, room_id, navigate, currentTurnPlayerId]);
+
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      try {
+        const res = await axiosInstance.get(`/rooms/${room_id}`);
+        if(res.data){
+          setTotalRound(res.data.rounds); // from DB
+        }
+      } catch (error) {
+        console.error("Error fetching room:", error);
+      }
+    }
+    if (room_id) fetchRoomData();
+  }, [room_id]);
+
 
   // --- Pre-turn countdown ---
   useEffect(() => {
@@ -312,7 +332,7 @@ const handleAnswerResult = ({ isCorrect, word, typedWord }: any) => {
               </h1>
             </div>
             <h1 className="text-5xl quicksand-semi">
-              Round {currentRound} of 3
+              Round {currentRound} of {totalRound ?? 3}
             </h1>
           </div>
         </div>
@@ -377,7 +397,7 @@ const handleAnswerResult = ({ isCorrect, word, typedWord }: any) => {
         {/* Game Area */}
         <div className="flex flex-col items-center gap-4">
           <div
-  className={`h-[30rem] w-[58rem] border-2 border-[#795A3E] p-4 rounded-xl flex flex-col items-center justify-center
+            className={`h-[30rem] w-[58rem] border-2 border-[#795A3E] p-4 rounded-xl flex flex-col items-center justify-center
   ${
     lastAnswerResult === "correct"
       ? "bg-green-400"
@@ -385,36 +405,45 @@ const handleAnswerResult = ({ isCorrect, word, typedWord }: any) => {
       ? "bg-red-400"
       : "bg-[#fddb6b]"
   }`}
->
-  {lastAnswerResult ? (
-    <div className="flex flex-col items-center text-center gap-4">
-      <h1 className="text-6xl font-extrabold text-white">{lastAnswerResult === "correct" ? lastWord : `❌ Correct answer: ${lastWord}`}</h1>
-      {lastWordDefinition && (
-        <p className="text-2xl text-white max-w-[40rem]">{lastWordDefinition}</p>
-      )}
-    </div>
-  ) : turnWord && currentTurnPlayerId ? (
-    <div className="flex flex-col items-center justify-center gap-4 text-center">
-      <h2 className="text-6xl font-extrabold">
-        {isCurrentUserTurn ? myInput : Object.values(othersTyping)[0]}
-      </h2>
-      {turnWord.definition && (
-        <p className="text-2xl max-w-[40rem]">{turnWord.definition}</p>
-      )}
-      {turnWord && (
-        <button
-          className="mt-2 bg-[#F5AF36] text-[#f3f3f3] px-4 py-2 rounded-lg font-bold hover:bg-[#E49B1B]"
-          onClick={() => speakWord(turnWord.word)}
-        >
-          🔊
-        </button>
-      )}
-    </div>
-  ) : (
-    <h1 className="text-3xl quicksand-bold">Waiting for next turn...</h1>
-  )}
-</div>
-
+          >
+            {lastAnswerResult ? (
+              <div className="flex flex-col items-center text-center gap-4">
+                <h1 className="text-6xl font-extrabold text-white">
+                  {lastAnswerResult === "correct"
+                    ? lastWord
+                    : `❌ Correct answer: ${lastWord}`}
+                </h1>
+                {lastWordDefinition && (
+                  <p className="text-2xl text-white max-w-[40rem]">
+                    {lastWordDefinition}
+                  </p>
+                )}
+              </div>
+            ) : turnWord && currentTurnPlayerId ? (
+              <div className="flex flex-col items-center justify-center gap-4 text-center">
+                <h2 className="text-6xl font-extrabold">
+                  {isCurrentUserTurn ? myInput : Object.values(othersTyping)[0]}
+                </h2>
+                {turnWord.definition && (
+                  <p className="text-2xl max-w-[40rem]">
+                    {turnWord.definition}
+                  </p>
+                )}
+                {turnWord && (
+                  <button
+                    className="mt-2 bg-[#F5AF36] text-[#f3f3f3] px-4 py-2 rounded-lg font-bold hover:bg-[#E49B1B]"
+                    onClick={() => speakWord(turnWord.word)}
+                  >
+                    🔊
+                  </button>
+                )}
+              </div>
+            ) : (
+              <h1 className="text-3xl quicksand-bold">
+                Waiting for next turn...
+              </h1>
+            )}
+          </div>
 
           {/* Answer Input + Submit */}
           <div className="flex gap-4 w-full max-w-5xl">

@@ -139,3 +139,17 @@ export const finalizeRoomIfEmpty = async (room_id) => {
   }
   return room;
 };
+
+// router for fetchRoom
+export const getRoomHandler = async (req, res) =>{
+  try {
+    const { room_id } = req.params;
+    const room = await fetchRoom(room_id);
+    if (!room) return res.status(404).json({ message: "Room not found" });
+
+    res.status(200).json(room);
+  } catch (error) {
+    console.error("Error fetching room:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
