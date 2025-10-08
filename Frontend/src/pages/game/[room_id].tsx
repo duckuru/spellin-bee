@@ -11,6 +11,8 @@ interface Player {
   username: string;
   score?: number;
   isActive: boolean;
+  lastAnswerWord?: string; // what to display
+  lastAnswerCorrect?: boolean | null; // true = correct, false = wrong, null = no turn yet
 }
 
 function GamePage() {
@@ -32,6 +34,7 @@ function GamePage() {
   const [preTurnCountdown, setPreTurnCountdown] = useState<number | null>(null);
 
   const [lastWord, setLastWord] = useState<string | null>(null);
+  const [lastWordDefinition, setLastWordDefinition] = useState<string | null>(null);
   const [lastAnswerResult, setLastAnswerResult] = useState<
     "correct" | "wrong" | null
   >(null);
@@ -99,6 +102,9 @@ function GamePage() {
       setTurnTimeLeft(turnTimeLeft ?? 20);
       setPreTurnCountdown(null);
 
+      // Reset lastAnswerCorrect for all players
+      setPlayers((prev) => prev.map((p) => ({ ...p, lastAnswerCorrect: null })));
+      
       if (word?.word){
         speakWord(word.word);
         setLastWord(word.word); // store the word for later
@@ -114,6 +120,7 @@ function GamePage() {
 
       if (turnWord?.word) {
         setLastWord(turnWord.word);
+        setLastWordDefinition(turnWord.definition);
       }
 
       setTurnWord(null);
@@ -128,15 +135,19 @@ function GamePage() {
       );
     };
 
-    const handleAnswerResult = ({ userId, isCorrect }: any) => {
-      if (userId === authUser?._id) {
-        toast(isCorrect ? "✅ Correct!" : "❌ Wrong!");
-        setLastAnswerResult(isCorrect ? "correct" : "wrong");
+const handleAnswerResult = ({ isCorrect, word, typedWord }: any) => {
+  setLastWord(isCorrect ? typedWord : word);
+  setLastWordDefinition(word.definition);
+  setLastAnswerResult(isCorrect ? "correct" : "wrong");
 
-        // Reset background color after 1.5 seconds
-        setTimeout(() => setLastAnswerResult(null), 1500);
-      }
-    };
+  setTimeout(() => {
+    setLastAnswerResult(null);
+    setLastWord(null);
+  }, 2500);
+};
+
+
+
 
     const handlePlayerLeftRoom = ({ userId, message }: any) => {
       toast(message);
@@ -366,44 +377,44 @@ function GamePage() {
         {/* Game Area */}
         <div className="flex flex-col items-center gap-4">
           <div
-            className={`h-[30rem] w-[58rem] border-2 border-[#795A3E] p-4 rounded-xl flex flex-col items-center justify-center
-    ${
-      lastAnswerResult === "correct"
-        ? "bg-green-400"
-        : lastAnswerResult === "wrong"
-        ? "bg-red-400"
-        : "bg-[#fddb6b]"
-    }`}
-          >
-            {turnWord && currentTurnPlayerId ? (
-              <div className="flex flex-col items-center justify-center gap-4 text-center">
-                <h2 className="text-6xl font-extrabold">
-                  {isCurrentUserTurn ? myInput : Object.values(othersTyping)[0]}
-                </h2>
-                {turnWord.definition && (
-                  <p className="text-2xl max-w-[40rem]">
-                    {turnWord.definition}
-                  </p>
-                )}
-                {turnWord && (
-                  <button
-                    className="mt-2 bg-[#F5AF36] text-[#f3f3f3] px-4 py-2 rounded-lg font-bold hover:bg-[#E49B1B]"
-                    onClick={() => speakWord(turnWord.word)}
-                  >
-                    🔊
-                  </button>
-                )}
-              </div>
-) : lastAnswerResult === "wrong" && lastWord ? (
-  <h1 className="text-3xl quicksand-bold text-white">
-    ❌ Correct answer: <span className="underline">{lastWord}</span>
-  </h1>
-) : (
-  <h1 className="text-3xl quicksand-bold">Waiting for next turn...</h1>
-)}
+  className={`h-[30rem] w-[58rem] border-2 border-[#795A3E] p-4 rounded-xl flex flex-col items-center justify-center
+  ${
+    lastAnswerResult === "correct"
+      ? "bg-green-400"
+      : lastAnswerResult === "wrong"
+      ? "bg-red-400"
+      : "bg-[#fddb6b]"
+  }`}
+>
+  {lastAnswerResult ? (
+    <div className="flex flex-col items-center text-center gap-4">
+      <h1 className="text-6xl font-extrabold text-white">{lastAnswerResult === "correct" ? lastWord : `❌ Correct answer: ${lastWord}`}</h1>
+      {lastWordDefinition && (
+        <p className="text-2xl text-white max-w-[40rem]">{lastWordDefinition}</p>
+      )}
+    </div>
+  ) : turnWord && currentTurnPlayerId ? (
+    <div className="flex flex-col items-center justify-center gap-4 text-center">
+      <h2 className="text-6xl font-extrabold">
+        {isCurrentUserTurn ? myInput : Object.values(othersTyping)[0]}
+      </h2>
+      {turnWord.definition && (
+        <p className="text-2xl max-w-[40rem]">{turnWord.definition}</p>
+      )}
+      {turnWord && (
+        <button
+          className="mt-2 bg-[#F5AF36] text-[#f3f3f3] px-4 py-2 rounded-lg font-bold hover:bg-[#E49B1B]"
+          onClick={() => speakWord(turnWord.word)}
+        >
+          🔊
+        </button>
+      )}
+    </div>
+  ) : (
+    <h1 className="text-3xl quicksand-bold">Waiting for next turn...</h1>
+  )}
+</div>
 
-
-          </div>
 
           {/* Answer Input + Submit */}
           <div className="flex gap-4 w-full max-w-5xl">

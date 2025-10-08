@@ -357,7 +357,12 @@ export const initRoomSockets = (io, socket) => {
       await updatePlayerScore(room_id, userId, state.scores[userId], true);
 
       io.to(room_id).emit("scoreUpdate", state.scores);
-      io.to(room_id).emit("answerResult", { userId, isCorrect });
+      // Emit to entire room
+      io.to(room_id).emit("answerResult", {
+        userId,
+        isCorrect,
+        word, // send the correct word so everyone can see it
+      });
       io.to(room_id).emit("turnEnded", { playerId: endedPlayer });
 
       schedulePreTurnIfNeeded(io, room_id, 5000);
