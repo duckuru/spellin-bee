@@ -1,16 +1,18 @@
-import { LoaderIcon, LockIcon, MailIcon } from 'lucide-react';
-import React, { useState } from 'react'
+import { LoaderIcon, LockIcon, MailIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import React, { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { Link } from 'react-router';
 
 function LoginPage() {
-  const [formData, setFormData] = useState({email: "", password: ""});
-  const {login, isLoggingIn} = useAuthStore();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false); // toggle visibility
+
+  const { login, isLoggingIn } = useAuthStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     login(formData);
-  }
+  };
 
   return (
     <div className="w-full h-screen flex justify-center items-center p-4 text-[#3f3f3f] z-50 bg-black/50">
@@ -37,24 +39,37 @@ function LoginPage() {
                 />
               </div>
             </div>
-            <div className="px-10">
-              <label className="auth-input-label">Password</label>
-              <div className="relative">
-                <LockIcon className="auth-input-icon" />
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className="input"
-                  placeholder="******"
-                />
-              </div>
-            </div>
+
+            {/* Password input */}
+<div className="px-10 relative">
+  <label className="auth-input-label">Password</label>
+  <div className="relative">
+    <LockIcon className="auth-input-icon" />
+    <input
+      type={showPassword ? "text" : "password"}
+      value={formData.password}
+      onChange={(e) =>
+        setFormData({ ...formData, password: e.target.value })
+      }
+      className="input pr-10" // make room for the eye icon
+      placeholder="******"
+    />
+    {/* Eye icon stays visible even on focus */}
+    <button
+      type="button"
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 z-20"
+      onClick={() => setShowPassword(!showPassword)}
+      tabIndex={-1} // prevent focusing the button
+    >
+      {showPassword ? <EyeIcon className="w-5 h-5 z-20" /> : <EyeOffIcon className="w-5 h-5 z-20" />}
+    </button>
+  </div>
+</div>
+
+
             <div className="px-10 mt-8">
               <button
-                className="py-3 w-full text-xl h-16 bg-[#d3d3d3] text-[3f3f3f] font-bold hover:bg-[#c5c5c5] transition-colors rounded-lg border-2  border-[#795a3e]"
+                className="py-3 w-full text-xl h-16 bg-[#d3d3d3] text-[3f3f3f] font-bold hover:bg-[#c5c5c5] transition-colors rounded-lg border-2 border-[#795a3e]"
                 type="submit"
                 disabled={isLoggingIn}
               >
@@ -66,6 +81,7 @@ function LoginPage() {
               </button>
             </div>
           </form>
+
           <div className="mt-6 text-center">
             <p className="mb-1 quicksand-semi">Don't have an account?</p>
             <Link
@@ -81,4 +97,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage
+export default LoginPage;

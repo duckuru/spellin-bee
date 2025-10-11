@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
-import { LoaderIcon, LockIcon, MailIcon, UserIcon } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, LoaderIcon, LockIcon, MailIcon, UserIcon } from 'lucide-react'
 import { Link } from 'react-router';
 import toast from 'react-hot-toast';
 
@@ -12,6 +12,7 @@ function SignupPage() {
     confirmPassword: "",
   });
   const {signup, isSigningUp} = useAuthStore()
+  const [showPassword, setShowPassword] = useState(false); // toggle visibility
 
   const handleSubmit = (e: React.FormEvent) =>{
     e.preventDefault();
@@ -69,7 +70,7 @@ function SignupPage() {
               <div className="relative">
                 <LockIcon className="auth-input-icon" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
@@ -77,6 +78,14 @@ function SignupPage() {
                   className="input"
                   placeholder="******"
                 />
+                    <button
+      type="button"
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 z-20"
+      onClick={() => setShowPassword(!showPassword)}
+      tabIndex={-1} // prevent focusing the button
+    >
+      {showPassword ? <EyeIcon className="w-5 h-5 z-20" /> : <EyeOffIcon className="w-5 h-5 z-20" />}
+    </button>
               </div>
             </div>
             <div className="px-10">
@@ -84,7 +93,7 @@ function SignupPage() {
               <div className="relative">
                 <LockIcon className="auth-input-icon" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   onChange={(e) =>
                     setFormData({

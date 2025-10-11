@@ -90,5 +90,5 @@ html, body {
 }
 
 .input{
-  @apply w-full bg-[#f3f3f3] border-2 border-[#795a3e] rounded-lg h-14 text-xl pl-10 pr-4 focus:ring-3 focus:ring-[#3f3f3f] focus:border-transparent;
+  @apply w-full bg-[#f3f3f3] border-2 border-[#795a3e] rounded-lg h-14 text-xl pl-10 pr-4 focus:ring-3 focus:ring-[#3f3f3f] focus:border-[#795a3e];
 }
