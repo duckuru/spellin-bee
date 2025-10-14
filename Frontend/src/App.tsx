@@ -100,7 +100,7 @@ function App() {
 
       <Toaster />
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 bg-[#3f3f3f]">
-      <AdBanner/>
+        <AdBanner/>
         <Ads />
       </div>
     </div>
