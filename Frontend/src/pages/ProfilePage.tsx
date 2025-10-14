@@ -84,6 +84,12 @@ function ProfilePage() {
   const handleBack = () => {
     navigate("/main");
   };
+  const handleGoBuy = () => {
+    navigate("/ads-package");
+  }
+  const handleGoSupport = () => {
+    navigate("/support");
+  }
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 pt-12 text-[#3f3f3f] overflow-hidden">
@@ -198,7 +204,10 @@ function ProfilePage() {
                   MMR: {userData?.mmr}
                 </span>
               </div>
-              <button className="border-2 rounded-xl p-4 hover:bg-[#ffe08d]">Ads Free Pakage: $2.99</button>
+              <div className="flex flex-row gap-4">
+              <button className="border-2 rounded-xl p-4 hover:bg-[#ffe08d]" onClick={handleGoBuy}>Ads Free Pakage: $2.99</button>
+              <button className="border-2 rounded-xl p-4 hover:bg-[#ffe08d]" onClick={handleGoSupport}>Support the Creator</button>
+              </div>
             </div>
           </>
         )}

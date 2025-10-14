@@ -1,9 +1,8 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from "react";
 
 export default function Ads() {
   const [isOpen, setIsOpen] = useState(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
 
   const AdsSource = [
     "/bannerAds.jpg",
@@ -16,15 +15,24 @@ export default function Ads() {
 
   const closeAds = () => {
     setIsOpen(false);
-  }
+  };
 
   useEffect(() => {
+    // Check if user has purchased Ads-Free
+    const hasAds = localStorage.getItem("hasAds");
+
+    if (hasAds === "false") {
+      setIsOpen(false); // disable ads permanently
+      return;
+    }
+
     // If the ad is closed, set a timer to reopen after 2 minutes
     if (!isOpen) {
       timerRef.current = setTimeout(() => {
         setIsOpen(true);
       }, 120000); // 2 minutes
     }
+
     // Clear timer if ad is reopened or component unmounts
     return () => {
       if (timerRef.current) {
@@ -34,13 +42,22 @@ export default function Ads() {
     };
   }, [isOpen]);
 
+  // Don’t show if user has ads removed
+  if (localStorage.getItem("hasAds") === "false") return null;
+
   return (
-    <div className='relative'>
-      {isOpen && <>
-        <button onClick={closeAds} className='cursor-pointer absolute top-0 right-0 z-51 bg-[#f3f3f3] px-2 text-[#3f3f3f] text-xl'>x</button>
-        <img src={randomAds} alt="Ads"  className='h-[6rem]'/>      
-      </>
-    }
+    <div className="relative">
+      {isOpen && (
+        <>
+          <button
+            onClick={closeAds}
+            className="cursor-pointer absolute top-0 right-0 z-51 bg-[#f3f3f3] px-2 text-[#3f3f3f] text-xl"
+          >
+            x
+          </button>
+          <img src={randomAds} alt="Ads" className="h-[6rem]" />
+        </>
+      )}
     </div>
-  )
-};
+  );
+}

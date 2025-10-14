@@ -14,6 +14,9 @@ import ProfilePage from './pages/ProfilePage';
 import LobbyPage from './pages/CreateLobbyPage';
 import Leaderboard from './pages/Leaderboard';
 import Ads from './components/ads/Ads';
+import AdsPackage from './pages/AdsPackage';
+import Support from './pages/Support';
+import AdBanner from './components/ads/AdsSense';
 
 
 function App() {
@@ -85,10 +88,19 @@ function App() {
           path="/results/:room_id"
           element={authUser ? <ResultPage /> : <Navigate to={"/login"} />}
         ></Route>
+        <Route
+          path="/ads-package"
+          element={authUser ? <AdsPackage /> : <Navigate to={"/login"} />}
+        ></Route>
+        <Route
+          path="/support"
+          element={authUser ? <Support /> : <Navigate to={"/login"} />}
+        ></Route>
       </Routes>
 
       <Toaster />
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 bg-[#3f3f3f]">
+      <AdBanner/>
         <Ads />
       </div>
     </div>

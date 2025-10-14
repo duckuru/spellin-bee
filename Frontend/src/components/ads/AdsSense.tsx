@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const AdBanner = () => {
+export default function AdBanner () {
   useEffect(() => {
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -22,10 +22,9 @@ const AdBanner = () => {
       className="adsbygoogle"
       style={{ display: "block", width: "100%", height: "90px" }}
       data-ad-client="ca-pub-6575607972726435"
-      data-ad-slot="9181995331"
-      data-adtest="on" // <- THIS MAKES IT A TEST AD
+      data-ad-slot="3283791078"
+      data-ad-format="auto"
+      data-full-width-responsive="true"
     ></ins>
   );
 };
-
-export default AdBanner;
