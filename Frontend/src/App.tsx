@@ -12,8 +12,8 @@ import GamePage from './pages/game/[room_id]';
 import ResultPage from './pages/result/[result_id]';
 import ProfilePage from './pages/ProfilePage';
 import LobbyPage from './pages/CreateLobbyPage';
-import AdBanner from './components/ads/AdsSense';
 import Leaderboard from './pages/Leaderboard';
+import Ads from './components/ads/Ads';
 
 
 function App() {
@@ -89,7 +89,7 @@ function App() {
 
       <Toaster />
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 bg-[#3f3f3f]">
-        <AdBanner />
+        <Ads />
       </div>
     </div>
   );

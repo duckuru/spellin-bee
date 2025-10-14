@@ -198,6 +198,7 @@ function ProfilePage() {
                   MMR: {userData?.mmr}
                 </span>
               </div>
+              <button className="border-2 rounded-xl p-4 hover:bg-[#ffe08d]">Ads Free Pakage: $2.99</button>
             </div>
           </>
         )}
