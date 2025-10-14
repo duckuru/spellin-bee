@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 
 export default function Ads() {
   const [isOpen, setIsOpen] = useState(true);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 
   const AdsSource = [
     "/bannerAds.jpg",
