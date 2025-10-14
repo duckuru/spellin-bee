@@ -38,8 +38,8 @@ const ResultPage: React.FC = () => {
   const heights: Record<number, string> = { 1: "35rem", 2: "28rem", 3: "21rem" };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 pt-32 text-[#3f3f3f] z-50 overflow-hidden">
-      <div className="relative w-[70rem] bg-[#f3f3f3] rounded-xl border-2 border-[#795A3E] h-[45rem] flex items-end justify-center">
+    <div className="w-full flex flex-col items-center justify-center gap-4 text-[#3f3f3f] z-50 overflow-hidden">
+      <div className="relative w-[50rem] lg:w-[70rem] bg-[#f3f3f3] rounded-xl border-2 border-[#795A3E] h-[45rem] flex items-end justify-center">
         <button
           onClick={() => setShowPopup(true)}
           className="absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition"

@@ -1,48 +1,48 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 export default function Ads() {
   const [isOpen, setIsOpen] = useState(true);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const AdsSource = [
     "/bannerAds.jpg",
     "/bannerAds2.jpg",
     "/bannerAds3.jpg",
     "/bannerAds4.jpg",
   ];
-
   const randomAds = AdsSource[Math.floor(Math.random() * AdsSource.length)];
 
   const closeAds = () => {
     setIsOpen(false);
+    const reopenTime = Date.now() + 2 * 60 * 1000; // 2min
+    localStorage.setItem("adClosedUntil", reopenTime.toString());
   };
 
   useEffect(() => {
-    // Check if user has purchased Ads-Free
     const hasAds = localStorage.getItem("hasAds");
-
     if (hasAds === "false") {
-      setIsOpen(false); // disable ads permanently
+      setIsOpen(false);
       return;
     }
 
-    // If the ad is closed, set a timer to reopen after 2 minutes
-    if (!isOpen) {
-      timerRef.current = setTimeout(() => {
+    const checkAdVisibility = () => {
+      const adClosedUntil = localStorage.getItem("adClosedUntil");
+      if (adClosedUntil && Date.now() < Number(adClosedUntil)) {
+        setIsOpen(false);
+      } else {
         setIsOpen(true);
-      }, 120000); // 2 minutes
-    }
-
-    // Clear timer if ad is reopened or component unmounts
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
+        localStorage.removeItem("adClosedUntil");
       }
     };
-  }, [isOpen]);
 
-  // Don’t show if user has ads removed
+    // Run once immediately
+    checkAdVisibility();
+
+    // Then run every second
+    const interval = setInterval(checkAdVisibility, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Don’t render if user has ad-free package
   if (localStorage.getItem("hasAds") === "false") return null;
 
   return (

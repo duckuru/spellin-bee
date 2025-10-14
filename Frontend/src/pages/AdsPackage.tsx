@@ -39,7 +39,7 @@ export default function AdsPackage() {
 
   alert("Payment successful! Ads have been disabled.");
   navigate("/profile");
-  // window.location.reload(); // Refresh to immediately remove ads
+  window.location.reload(); // Refresh to immediately remove ads
 };
 
   const handleBack = () => {
@@ -133,7 +133,7 @@ export default function AdsPackage() {
                 <input
                   type="password"
                   placeholder="123"
-                  maxLength={4}
+                  maxLength={3}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#795a3e] outline-none"
                 />
               </div>

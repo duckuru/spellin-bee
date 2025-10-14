@@ -31,9 +31,9 @@ export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
       <div
         className="flex items-center justify-center
                    bg-[#f3f3f3] border-2 border-[#795a3e] rounded-lg shadow-md
-                   w-[25rem] h-[5.625rem]"
+                   w-[17rem] h-[4.625rem] lg:w-[25rem] lg:h-[5.625rem]"
       >
-        <p className="text-[3rem] quicksand-semi text-[#795A3E] text-center">
+        <p className="text-[2rem] lg:text-[3rem] quicksand-semi text-[#795A3E] text-center">
           {matchmake[currentIndex]}
         </p>
       </div>
@@ -45,16 +45,16 @@ export default function Matchmaking({ stopMatchmaking }: MatchmakeProps) {
     if (stopMatchmaking) stopMatchmaking(); // reset Play button
   }}
         className="bg-[#f3f3f3] opacity-80 hover:opacity-100 hover:bg-[#f3f3f3] 
-                   shadow-md border-2 border-[#795a3e] rounded-lg h-[5.625rem] w-[5.625rem]"
+                   shadow-md border-2 border-[#795a3e] rounded-lg h-[4.625rem] w-[4.625rem] lg:h-[5.625rem] lg:w-[5.625rem]"
       >
         <FontAwesomeIcon
           icon={faXmark}
           style={{ color: "#3f3f3f" }}
-          className="text-[3rem]"
+          className="text-[2rem] lg:text-[3rem]"
         />
       </button>
-      <p className="text-[3rem] quicksand-semi text-[#795A3E] text-center w-full absolute top-20">
-        {currentQueueLength} /3
+      <p className="text-[2rem] lg:text-[3rem] quicksand-semi text-[#795A3E] text-center w-full absolute top-20">
+        {currentQueueLength} /2
       </p>
     </div>
   );

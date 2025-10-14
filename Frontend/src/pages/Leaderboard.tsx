@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import ProfileComponent from "../components/navigations/ProfileComponent";
+// import ProfileComponent from "../components/navigations/ProfileComponent";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -46,24 +46,24 @@ function Leaderboard() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-12">
-      <div className="absolute z-60 right-20 top-[4.6rem] gap-2">
+    <div className="relative overflow-hidden">
+      {/* <div className="absolute z-60 right-20 top-[4.6rem] gap-2">
         <ProfileComponent />
-      </div>
+      </div> */}
 
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="flex w-full max-w-[70%] h-[70vh] bg-[#FDDB5B] border-[#795A3E] border-2 rounded-2xl">
+      <div className="flex items-center justify-center px-8 lg:p-0">
+        <div className="flex w-full lg:max-w-[70%] h-[70vh] bg-[#FDDB5B] border-[#795A3E] border-2 rounded-2xl">
           <div className="flex flex-col w-full h-full rounded text-[#795A3E] p-8">
             <div className="relative">
               <button
                 onClick={handleLeaveRoom}
-                className="absolute cursor-pointer py-3 px-2 rounded-lg"
+                className="absolute cursor-pointer  lg:py-3 lg:px-2 rounded-lg"
               >
-                <FontAwesomeIcon icon={faChevronLeft} className="text-4xl" />
-                <span className="text-4xl items-center">Back</span>
+                <FontAwesomeIcon icon={faChevronLeft} className="text-2xl lg:text-4xl" />
+                <span className="text-2xl lg:text-4xl items-center">Back</span>
               </button>
             </div>
-            <h1 className="text-6xl sour-gummy-bold mb-4 text-center">
+            <h1 className=" text-4xl lg:text-6xl sour-gummy-bold mb-4 text-center">
               Leaderboard
             </h1>
 
@@ -71,7 +71,7 @@ function Leaderboard() {
             <div className="overflow-hidden border-b-2 border-[#795A3E]">
               <table className="w-full table-fixed border-collapse">
                 <thead className="bg-[#FDDB5B] sticky top-0 z-10">
-                  <tr className="text-[2.5rem] sour-gummy-bold">
+                  <tr className="text-[1.5rem] lg:text-[2.5rem] sour-gummy-bold">
                     <th className="w-[15%] px-6 text-left">No</th>
                     <th className="w-[35%] px-6 text-left">Username</th>
                     <th className="w-[25%] px-6 pr-10 text-center">Rank</th>
@@ -83,7 +83,7 @@ function Leaderboard() {
 
             {/* Scrollable body */}
             <div
-              className="flex-1 overflow-y-auto max-h-[26rem] mt-2"
+              className="flex-1 overflow-y-auto max-h-[26rem] mt-2 lg:mt-2"
               ref={scrollRef}
               onScroll={updatePinnedState}
             >
@@ -93,11 +93,11 @@ function Leaderboard() {
                     <tr
                       key={user.userId}
                       ref={user.userId === authUser?._id ? authUserRef : null}
-                      className={`text-[2.5rem] sour-gummy-semi ${
+                      className={`text-[1.5rem] lg:text-[2.5rem] sour-gummy-semi ${
                         user.userId === authUser?._id ? "text-[#2E74F5]" : ""
                       }`}
                     >
-                      <td className="w-[15%] px-6 text-left">{idx + 1}</td>
+                      <td className="w-[15%] px-6 py-4 lg:py-1 text-left">{idx + 1}</td>
                       <td className="w-[35%] px-6 text-left">
                         <div className="flex items-center gap-4">
                           <div className="avatar relative">
@@ -133,7 +133,7 @@ function Leaderboard() {
 
             {/* Pinned row */}
             {authUser && isPinned && (
-              <div className="flex justify-between px-6 text-[#2E74F5] sticky bottom-0 text-[2.5rem] sour-gummy-semi bg-[#FDDB5B] border-t-2 border-[#795A3E]">
+              <div className="flex justify-between px-6 text-[#2E74F5] sticky bottom-0 text-[1.5rem] lg:text-[2.5rem] sour-gummy-semi bg-[#FDDB5B] border-t-2 border-[#795A3E]">
                 <span className="w-[15%] text-left">
                   {leaderboard.findIndex((u) => u.userId === authUser._id) + 1}
                 </span>

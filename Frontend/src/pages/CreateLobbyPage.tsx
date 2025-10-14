@@ -3,9 +3,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { toast } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faCircle, faClock, faGamepad, faLink, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronLeft,
+  faCircle,
+  faClock,
+  faGamepad,
+  faLink,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import ProfileComponent from "../components/navigations/ProfileComponent";
+// import ProfileComponent from "../components/navigations/ProfileComponent";
 
 interface Player {
   userId: string;
@@ -25,13 +32,23 @@ export default function LobbyPage() {
 
   const [roomId, setRoomId] = useState(paramRoomId || "");
   const [players, setPlayers] = useState<Player[]>([
-    { userId: authUser._id, username: authUser.username, score: 0, isActive: true, isHost: true },
+    {
+      userId: authUser._id,
+      username: authUser.username,
+      score: 0,
+      isActive: true,
+      isHost: true,
+    },
   ]);
-  const [settings, setSettings] = useState({ turnTime: 30, rounds: 3, difficulty: "easy" });
+  const [settings, setSettings] = useState({
+    turnTime: 30,
+    rounds: 3,
+    difficulty: "easy",
+  });
   const [roomLink, setRoomLink] = useState("");
   const [isCreated, setIsCreated] = useState(false);
 
-  const isHost = players.find(p => p.userId === authUser._id)?.isHost;
+  const isHost = players.find((p) => p.userId === authUser._id)?.isHost;
 
   useEffect(() => {
     if (!socket) return;
@@ -114,14 +131,14 @@ export default function LobbyPage() {
   };
 
   const copyRoomIdToClipboard = async () => {
-  try {
-    await navigator.clipboard.writeText(roomLink);
-    toast.success("Room ID copied to clipboard!");
-  } catch (err) {
-    console.error("Clipboard copy failed:", err);
-    toast.error("Failed to copy Room ID");
-  }
-};
+    try {
+      await navigator.clipboard.writeText(roomLink);
+      toast.success("Room ID copied to clipboard!");
+    } catch (err) {
+      console.error("Clipboard copy failed:", err);
+      toast.error("Failed to copy Room ID");
+    }
+  };
 
   const handleCreateLobby = () => {
     if (!socket || !authUser) return;
@@ -143,16 +160,27 @@ export default function LobbyPage() {
   const handleStartGame = () => {
     if (!isHost) return toast.error("Only host can start");
     if (players.length < 2) return toast.error("Need at least 2 players");
-    socket.emit("startGame", { room_id: roomId, hostId: authUser._id }, (res: any) => {
-      if (res?.error) toast.error(res.error);
-    });
+    socket.emit(
+      "startGame",
+      { room_id: roomId, hostId: authUser._id },
+      (res: any) => {
+        if (res?.error) toast.error(res.error);
+      }
+    );
   };
 
-  const updateSetting = (key: "turnTime" | "rounds" | "difficulty", value: any) => {
+  const updateSetting = (
+    key: "turnTime" | "rounds" | "difficulty",
+    value: any
+  ) => {
     if (!isHost) return;
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
-    socket.emit("updateSettings", { room_id: roomId, hostId: authUser._id, settings: newSettings });
+    socket.emit("updateSettings", {
+      room_id: roomId,
+      hostId: authUser._id,
+      settings: newSettings,
+    });
   };
 
   const handleKickPlayer = (userId: string) => {
@@ -162,32 +190,38 @@ export default function LobbyPage() {
 
   // ------------------- Render -------------------
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 text-[#3f3f3f] z-50">
-      <div className="flex justify-end absolute right-20 top-[4.6rem] items-center gap-2">
+    <div className="w-full flex flex-col items-center justify-center gap-4 text-[#3f3f3f] z-50">
+      {/* <div className="flex justify-end absolute right-20 top-[4.6rem] items-center gap-2">
         <ProfileComponent />
-      </div>
+      </div> */}
 
       {/* Top Bar */}
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full max-w-[85rem]">
-        <button onClick={handleBack} className="bg-[#f3f3f3] border-2 border-[#795A3E] hover:bg-[#FDDB5B] py-4 px-3 rounded-lg">
-          <FontAwesomeIcon icon={faChevronLeft} className="text-4xl" />
+      <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full max-w-[50rem] lg:max-w-[85rem]">
+        <button
+          onClick={handleBack}
+          className="bg-[#f3f3f3] border-2 border-[#795A3E] hover:bg-[#FDDB5B] py-4 px-3 rounded-lg"
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            className="text-2xl lg:text-4xl"
+          />
         </button>
         <div className="flex justify-center w-full">
-          <div className="flex justify-between items-center bg-[#f3f3f3] py-3 px-6 border-2 border-[#795A3E] rounded-lg w-full">
+          <div className="flex justify-between items-center bg-[#f3f3f3] py-3 px-6 border-2 border-[#795A3E] rounded-lg w-full text-3xl lg:text-5xl">
             <div className="flex items-center gap-3">
-              <FontAwesomeIcon icon={faClock} className="text-5xl" />
-              <span className="text-5xl quicksand-semi">{settings.turnTime}s</span>
+              <FontAwesomeIcon icon={faClock} className="" />
+              <span className="quicksand-semi">{settings.turnTime}s</span>
             </div>
-            <span className="text-5xl quicksand-semi">Round {settings.rounds}</span>
-            <span className="text-5xl quicksand-semi">Players: {players.length}/6</span>
+            <span className="quicksand-semi">Round {settings.rounds}</span>
+            <span className="quicksand-semi">Players: {players.length}/6</span>
           </div>
         </div>
       </div>
 
       {/* Lobby content */}
-      <div className="flex flex-row gap-4 justify-center items-start pl-22">
+      <div className="flex flex-row gap-2 lg:gap-4 justify-center items-start pl-18 lg:pl-22">
         {/* Players */}
-        <div className="flex flex-col gap-4 w-[20rem]">
+        <div className="flex flex-col gap-2 lg:gap-4 w-[11rem] lg:w-[20rem]">
           {players.map((player, index) => (
             <motion.div
               key={player.userId}
@@ -196,59 +230,77 @@ export default function LobbyPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.5 }}
-              className={`flex items-center justify-between p-2 border-2 rounded-xl h-[4.375rem] ${
-                player.isHost ? "bg-yellow-100 border-yellow-500" : "bg-[#f3f3f3] border-[#795A3E]"
+              className={`flex items-center justify-between p-2 border-2 rounded-xl h-[3.375rem] lg:h-[4.375rem] ${
+                player.isHost
+                  ? "bg-yellow-100 border-yellow-500"
+                  : "bg-[#f3f3f3] border-[#795A3E]"
               }`}
             >
-<div className="flex items-center justify-between p-2 rounded-xl h-[4.375rem] relative">
-  {isHost && !player.isHost && (
-    <button
-      onClick={() => handleKickPlayer(player.userId)}
-      className="ml-2 text-red-600 hover:text-red-800 text-2xl cursor-pointer"
-      title={`Kick ${player.username}`}
-    >
-      <FontAwesomeIcon icon={faXmark} />
-    </button>
-  )}
-  {/* rest of player card */}
-</div>
+              <div className="flex items-center justify-between lg:p-2 rounded-xl h-[3.375rem] lg:h-[4.375rem]  relative">
+                {isHost && !player.isHost && (
+                  <button
+                    onClick={() => handleKickPlayer(player.userId)}
+                    className="lg:ml-2 text-red-600 hover:text-red-800 text-lg lg:text-2xl cursor-pointer"
+                    title={`Kick ${player.username}`}
+                  >
+                    <FontAwesomeIcon icon={faXmark} />
+                  </button>
+                )}
+                {/* rest of player card */}
+              </div>
 
               <div className="flex flex-col items-center w-16">
-                {index === 0 && <span className="text-yellow-400 text-xl">👑</span>}
-                <span className="text-xl sour-gummy-semi-bold">#{index + 1}</span>
+                {index === 0 && (
+                  <span className="text-yellow-400 text-sm lg:text-xl">👑</span>
+                )}
+                <span className=" text-sm lg:text-xl sour-gummy-semi-bold">
+                  #{index + 1}
+                </span>
               </div>
 
               <div className="flex-1 text-center">
-                <span className="text-xl sour-gummy">{player.username}</span>
-                {player.isHost && <span className="ml-2 text-sm text-yellow-600 font-semibold">[Host]</span>}
+                <span className="  text-sm lg:text-xl sour-gummy">{player.username}</span>
+                {player.isHost && (
+                  <span className="ml-2 text-sm text-yellow-600 font-semibold">
+                    [Host]
+                  </span>
+                )}
               </div>
 
               <div className="w-20 text-right">
-                <span className="text-xl sour-gummy">{player.score ?? 0} pts</span>
+                <span className=" text-sm lg:text-xl sour-gummy">
+                  {player.score ?? 0} pts
+                </span>
               </div>
             </motion.div>
           ))}
         </div>
 
         {/* Settings */}
-        <div className="flex flex-col gap-8 h-[30rem] w-[58rem] border-2 border-[#795A3E] p-4 rounded-xl bg-[#fddb6b]">
-          <div className="flex justify-between items-center">
-            <div className="text-5xl text-[#3f3f3f] sour-gummy space-x-6">
+        <div className="flex flex-col gap-4 lg:gap-8 h-[25rem] lg:h-[30rem] w-[34rem] lg:w-[58rem] border-2 border-[#795A3E] p-4 rounded-xl bg-[#fddb6b]">
+          <div className="flex justify-between items-center gap-32">
+            <div className="flex text-2xl items-center lg:text-5xl text-[#3f3f3f] sour-gummy lg:space-x-6">
               <FontAwesomeIcon icon={faClock} />
               <span>Timer</span>
             </div>
             <select
               value={settings.turnTime}
-              onChange={(e) => updateSetting("turnTime", Number(e.target.value))}
+              onChange={(e) =>
+                updateSetting("turnTime", Number(e.target.value))
+              }
               disabled={!isHost}
-              className="text-3xl bg-[#f3f3f3] border-2 rounded-lg border-[#795A3E] w-[30rem] px-2 py-2"
+              className=" flex text-2xl lg:text-3xl bg-[#f3f3f3] border-2 rounded-lg border-[#795A3E] w-[30rem] px-2 py-2"
             >
-              {[30, 25, 20, 15, 10].map(v => <option key={v} value={v}>{v}s</option>)}
+              {[30, 25, 20, 15, 10].map((v) => (
+                <option key={v} value={v}>
+                  {v}s
+                </option>
+              ))}
             </select>
           </div>
 
-          <div className="flex justify-between items-center">
-            <div className="text-5xl text-[#3f3f3f] sour-gummy space-x-6">
+          <div className="flex justify-between items-center gap-25">
+            <div className="flex text-2xl items-center lg:text-5xl text-[#3f3f3f] sour-gummy lg:space-x-6">
               <FontAwesomeIcon icon={faGamepad} />
               <span>Difficulty</span>
             </div>
@@ -256,14 +308,18 @@ export default function LobbyPage() {
               value={settings.difficulty}
               onChange={(e) => updateSetting("difficulty", e.target.value)}
               disabled={!isHost}
-              className="text-3xl bg-[#f3f3f3] border-2 rounded-lg border-[#795A3E] w-[30rem] px-2 py-2"
+              className=" flex text-2xl lg:text-3xl bg-[#f3f3f3] border-2 rounded-lg border-[#795A3E] w-[30rem] px-2 py-2"
             >
-              {["easy", "medium", "hard"].map(v => <option key={v} value={v}>{v}</option>)}
+              {["easy", "medium", "hard"].map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
             </select>
           </div>
 
-          <div className="flex justify-between items-center">
-            <div className="text-5xl text-[#3f3f3f] sour-gummy space-x-6">
+          <div className="flex justify-between items-center  gap-32">
+            <div className="flex text-2xl items-center lg:text-5xl text-[#3f3f3f] sour-gummy lg:space-x-6">
               <FontAwesomeIcon icon={faCircle} />
               <span>Round</span>
             </div>
@@ -271,9 +327,13 @@ export default function LobbyPage() {
               value={settings.rounds}
               onChange={(e) => updateSetting("rounds", Number(e.target.value))}
               disabled={!isHost}
-              className="text-3xl bg-[#f3f3f3] border-2 rounded-lg border-[#795A3E] w-[30rem] px-2 py-2"
+              className=" flex text-2xl lg:text-3xl bg-[#f3f3f3] border-2 rounded-lg border-[#795A3E] w-[30rem] px-2 py-2"
             >
-              {[3, 2, 1].map(v => <option key={v} value={v}>{v}</option>)}
+              {[3, 2, 1].map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -283,13 +343,13 @@ export default function LobbyPage() {
               value={roomLink}
               readOnly
               placeholder="Room Id here"
-              className="h-[4rem] bg-[#f3f3f3] text-[#3f3f3f] text-4xl py-2 px-1 rounded-xl border-2 border-[#795A3E] shadow-md cursor-pointer"
+              className="h-[3rem] w-[12rem] lg:w-[25rem] lg:h-[4rem] bg-[#f3f3f3] text-[#3f3f3f] text-2xl lg:text-4xl py-2 px-1 rounded-xl border-2 border-[#795A3E] shadow-md cursor-pointer"
               onClick={copyRoomIdToClipboard}
             />
 
             {!isCreated && !paramRoomId && (
               <button
-                className="bg-[#F5AF36] text-[#f3f3f3] text-4xl py-2 px-8 rounded-xl border-2 border-[#795A3E] shadow-md hover:bg-[#E49B1B]"
+                className="h-[3rem] w-[18rem] lg:w-[25rem] lg:h-[4rem] bg-[#F5AF36] text-[#f3f3f3] text-2xl lg:text-4xl py-2 px-8 rounded-xl border-2 border-[#795A3E] shadow-md hover:bg-[#E49B1B]"
                 onClick={handleCreateLobby}
               >
                 <FontAwesomeIcon icon={faLink} />
@@ -300,7 +360,7 @@ export default function LobbyPage() {
 
           {isHost && isCreated && (
             <button
-              className="bg-[#F5AF36] text-[#f3f3f3] text-4xl py-4 rounded-xl border-2 border-[#795A3E] shadow-md hover:bg-[#E49B1B]"
+              className="bg-[#F5AF36] text-[#f3f3f3] text-2xl lg:text-4xl py-2 lg:py-4 rounded-xl border-2 border-[#795A3E] shadow-md hover:bg-[#E49B1B]"
               onClick={handleStartGame}
             >
               Start Game

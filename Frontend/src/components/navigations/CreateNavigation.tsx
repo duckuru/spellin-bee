@@ -22,9 +22,13 @@ function CreateNavigation({ onClick }: CreateNavigationProps) {
   };
 
   return (
-    <div className="px-6 pt-6">
+    <div className="lg:px-6 sm:px-4 lg:pt-6 sm:pt-3">
       <button
-        className="text-[3rem] quicksand-bold bg-[#FDDB5B] text-[#3f3f3f] w-full p-1 border-2 border-[#795A3E] hover:bg-[#FFC105] rounded-xl"
+        className="quicksand-bold w-full p-1 border-2 border-[#795A3E] rounded-xl text-[#3f3f3f] bg-[#FDDB5B]
+    hover:bg-[#FFC105]
+          transition-all duration-200 ease-in-out
+          text-[1.5rem] sm:text-[1.5rem] lg:text-[3rem]"
+          
         onClick={handleClick}
         // onClick={handleNavCreate}
       >

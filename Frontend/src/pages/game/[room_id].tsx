@@ -312,26 +312,26 @@ function GamePage() {
   const isCurrentUserTurn = authUser?._id === currentTurnPlayerId;
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 pt-12 text-[#3f3f3f] z-50">
+    <div className="w-full flex flex-col items-center justify-center gap-4 text-[#3f3f3f] z-50">
       {/* Top Bar */}
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full max-w-[85rem]">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full  max-w-[50rem] lg:max-w-[85rem]">
         <button
           onClick={handleLeaveRoom}
           className="bg-[#f3f3f3] border-2 border-[#795A3E] hover:bg-[#FDDB5B] py-4 px-3 rounded-lg"
         >
-          <FontAwesomeIcon icon={faChevronLeft} className="text-4xl" />
+          <FontAwesomeIcon icon={faChevronLeft} className="text-2xl lg:text-4xl" />
         </button>
         <div className="flex justify-center w-full">
           <div className="flex justify-between items-center bg-[#f3f3f3] py-3 px-6 border-2 border-[#795A3E] rounded-lg w-full">
-            <div className="flex items-center gap-3">
-              <FontAwesomeIcon icon={faClock} className="text-5xl" />
-              <h1 className="text-5xl quicksand-semi">
+            <div className="flex items-center gap-3 text-3xl lg:text-5xl">
+              <FontAwesomeIcon icon={faClock} className="text-3xl lg:text-5xl" />
+              <h1 className="text-3xl lg:text-5xl quicksand-semi">
                 {preTurnCountdown !== null
                   ? `Starting in ${preTurnCountdown}s`
                   : `${turnTimeLeft}s`}
               </h1>
             </div>
-            <h1 className="text-5xl quicksand-semi">
+            <h1 className="text-3xl lg:text-5xl quicksand-semi">
               Round {currentRound} of {totalRound ?? 3}
             </h1>
           </div>
@@ -339,9 +339,9 @@ function GamePage() {
       </div>
 
       {/* Player Cards + Game Area */}
-      <div className="flex flex-col md:flex-row gap-4 justify-center items-start pl-22">
+      <div className="flex flex-row gap-2 lg:gap-4 justify-center items-start pl-18 lg:pl-22">
         {/* Player List */}
-        <div className="flex flex-col gap-2 w-[20rem]">
+        <div className="flex flex-col gap-2 lg:gap-4 w-[11rem] lg:w-[20rem]">
           <AnimatePresence>
             {sortedPlayers.map((player, index) => {
               const isCurrentUser = player.userId === authUser?._id;
@@ -354,37 +354,37 @@ function GamePage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.5 }}
-                  className={`flex items-center justify-between p-2 border-2 rounded-xl w-[20rem] h-[4.375rem]
+                  className={`flex items-center justify-between p-2 border-2 rounded-xl h-[3.375rem] lg:h-[4.375rem]
                     ${
                       isActiveTurn
                         ? "bg-[#fddc5f] border-[#f5af36]"
                         : "bg-[#f3f3f3] border-[#795A3E]"
                     }`}
                 >
-                  <div className="flex flex-col items-center w-16">
+                  <div className="flex flex-col items-center w-10 lg:w-16">
                     {index === 0 && (
-                      <span className="text-yellow-400 text-xl">👑</span>
+                      <span className="text-yellow-400 text-sm lg:text-xl">👑</span>
                     )}
-                    <span className="text-xl sour-gummy-semi-bold">
+                    <span className="text-sm lg:text-xl sour-gummy-semi-bold">
                       #{index + 1}
                     </span>
                   </div>
 
-                  <div className="flex-1 text-center">
+                  <div className="flex-1 text-center w-10">
                     <span
-                      className={`text-xl sour-gummy ${
+                      className={`text-sm lg:text-xl sour-gummy ${
                         isCurrentUser ? "text-blue-500 font-bold" : ""
                       } ${!player?.isActive ? "opacity-50 line-through" : ""}`}
                     >
                       {player.username || "Waiting..."}
                     </span>
                     {isActiveTurn && (
-                      <div className="text-sm mt-1">Taking turn</div>
+                      <div className="text-[0.5rem] lg:text-sm mt-1">Taking turn</div>
                     )}
                   </div>
 
-                  <div className="w-20 text-right">
-                    <span className="text-xl sour-gummy">
+                  <div className="w-15 lg:w-20 text-right">
+                    <span className="text-sm lg:text-xl sour-gummy">
                       {player.score ?? 0} pts
                     </span>
                   </div>
@@ -397,7 +397,7 @@ function GamePage() {
         {/* Game Area */}
         <div className="flex flex-col items-center gap-4">
           <div
-            className={`h-[30rem] w-[58rem] border-2 border-[#795A3E] p-4 rounded-xl flex flex-col items-center justify-center
+            className={`h-[25rem] lg:h-[30rem] w-[34rem] lg:w-[58rem] border-2 border-[#795A3E] p-4 rounded-xl flex flex-col items-center justify-center
   ${
     lastAnswerResult === "correct"
       ? "bg-green-400"
@@ -408,30 +408,30 @@ function GamePage() {
           >
             {lastAnswerResult ? (
               <div className="flex flex-col items-center text-center gap-4">
-                <h1 className="text-6xl font-extrabold text-white">
+                <h1 className="text-4xl lg:text-6xl font-extrabold text-white">
                   {lastAnswerResult === "correct"
                     ? lastWord
                     : `❌ Correct answer: ${lastWord}`}
                 </h1>
                 {lastWordDefinition && (
-                  <p className="text-2xl text-white max-w-[40rem]">
+                  <p className="text-xl lg:text-2xl text-white max-w-[40rem]">
                     {lastWordDefinition}
                   </p>
                 )}
               </div>
             ) : turnWord && currentTurnPlayerId ? (
               <div className="flex flex-col items-center justify-center gap-4 text-center">
-                <h2 className="text-6xl font-extrabold">
+                <h2 className="text-4xl lg:text-6xl font-extrabold">
                   {isCurrentUserTurn ? myInput : Object.values(othersTyping)[0]}
                 </h2>
                 {turnWord.definition && (
-                  <p className="text-2xl max-w-[40rem]">
+                  <p className="text-xl lg:text-2xl max-w-[40rem]">
                     {turnWord.definition}
                   </p>
                 )}
                 {turnWord && (
                   <button
-                    className="mt-2 bg-[#F5AF36] text-[#f3f3f3] px-4 py-2 rounded-lg font-bold hover:bg-[#E49B1B]"
+                    className="lg:mt-2 bg-[#F5AF36] text-[#f3f3f3] px-4 py-2 rounded-lg font-bold hover:bg-[#E49B1B]"
                     onClick={() => speakWord(turnWord.word)}
                   >
                     🔊
@@ -439,7 +439,7 @@ function GamePage() {
                 )}
               </div>
             ) : (
-              <h1 className="text-3xl quicksand-bold">
+              <h1 className="text-xl lg:text-3xl quicksand-bold">
                 Waiting for next turn...
               </h1>
             )}

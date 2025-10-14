@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import ProfileComponent from "../components/navigations/ProfileComponent";
+// import ProfileComponent from "../components/navigations/ProfileComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
@@ -92,11 +92,11 @@ function ProfilePage() {
   }
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 pt-12 text-[#3f3f3f] overflow-hidden">
-      <div className="flex justify-end absolute z-60 right-20 top-[4.6rem] items-center gap-2">
+    <div className="w-full flex flex-col items-center justify-center gap-4 text-[#3f3f3f] overflow-hidden">
+      {/* <div className="flex justify-end absolute z-60 right-20 top-[4.6rem] items-center gap-2">
         <ProfileComponent />
-      </div>
-      <div className="relative w-[70rem] bg-[#FDDB5B] rounded-xl border-2 border-[#795A3E] h-[40rem] p-6 overflow-y-auto">
+      </div> */}
+      <div className="relative w-[50rem] lg:w-[70rem] bg-[#FDDB5B] rounded-xl border-2 border-[#795A3E] h-[40rem] p-6 overflow-y-auto">
         <div className="flex gap-4 mb-4 text-[2rem] text-[#3f3f3f] sour-gummy">
           <button
             onClick={handleBack}

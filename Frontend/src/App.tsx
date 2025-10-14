@@ -1,50 +1,69 @@
-import { Navigate, Route, Routes} from 'react-router'
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import MainPage from './pages/MainPage';
-import GuestPage from './pages/GuestPage';
-import HexagonBackground from './components/background/Hexagon';
-import { useEffect, useMemo } from 'react';
-import { useAuthStore } from './store/useAuthStore';
-import PageLoader from './components/PageLoader';
-import { Toaster } from 'react-hot-toast';
-import GamePage from './pages/game/[room_id]';
-import ResultPage from './pages/result/[result_id]';
-import ProfilePage from './pages/ProfilePage';
-import LobbyPage from './pages/CreateLobbyPage';
-import Leaderboard from './pages/Leaderboard';
-import Ads from './components/ads/Ads';
-import AdsPackage from './pages/AdsPackage';
-import Support from './pages/Support';
-import AdBanner from './components/ads/AdsSense';
-
+import { Navigate, Route, Routes, useLocation } from "react-router";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import MainPage from "./pages/MainPage";
+import GuestPage from "./pages/GuestPage";
+import HexagonBackground from "./components/background/Hexagon";
+import { useEffect, useMemo } from "react";
+import { useAuthStore } from "./store/useAuthStore";
+import PageLoader from "./components/PageLoader";
+import { Toaster } from "react-hot-toast";
+import GamePage from "./pages/game/[room_id]";
+import ResultPage from "./pages/result/[result_id]";
+import ProfilePage from "./pages/ProfilePage";
+import LobbyPage from "./pages/CreateLobbyPage";
+import Leaderboard from "./pages/Leaderboard";
+import Ads from "./components/ads/Ads";
+import AdsPackage from "./pages/AdsPackage";
+import Support from "./pages/Support";
+// import AdBanner from './components/ads/AdsSense';
+import ProfileComponent from "./components/navigations/ProfileComponent";
 
 function App() {
-  const colors = useMemo(() => ["#795a3e", "#fddb59", "#ffc105", "#f3f3f3", "#3f3f3f",], []);
+  const colors = useMemo(
+    () => ["#795a3e", "#fddb59", "#ffc105", "#f3f3f3", "#3f3f3f"],
+    []
+  );
+  const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
+  const location = useLocation();
 
-  const {checkAuth, isCheckingAuth, authUser} = useAuthStore();
+  // Paths where the profile button should NOT appear
+  const hiddenProfileRoutes = ["/login", "/signup", "/ads-package"];
+
+  // Dynamically check if we're in a /game/:room_id route
+  const isGamePage = location.pathname.startsWith("/game/");
+
+  const shouldShowProfile =
+    authUser && !hiddenProfileRoutes.includes(location.pathname) && !isGamePage;
 
   useEffect(() => {
-    checkAuth()
-  },[checkAuth])
-
+    checkAuth();
+  }, [checkAuth]);
 
   // console.log({authUser})
   // console.log({onlineUsers})
 
-  if(isCheckingAuth) return <PageLoader/>
+  if (isCheckingAuth) return <PageLoader />;
 
   return (
     <div className="min-h-screen overflow-hidden flex flex-col bg-gradient-to-b from-[#ffe397] to-[#f3f3f3] quicksand-bold">
       <HexagonBackground colorsProp={colors} />
-      <div className="absolute top-[2rem] w-full flex items-center justify-center px-[3rem] z-20">
-        <div className="flex items-center  gap-4">
+      <div className="relative w-full h-full flex items-center justify-center px-6 py-6 md:py-10">
+        {/* ✅ Profile always top-right */}
+        {shouldShowProfile && (
+          <div className="absolute top-6 right-4 md:top-13 md:right-8 lg:top-16 lg:right-16 z-51">
+            <ProfileComponent />
+          </div>
+        )}
+
+        {/* ✅ Centered logo */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
           <img
             src="/logoSB4.png"
             alt="Spelling Bee"
-            className="w-[clamp(4rem,6.8vw,12rem)] h-[clamp(4rem,6.8vw,12rem)]"
+            className="w-[3.5rem] h-[3.5rem] sm:w-[4rem] sm:h-[4rem] md:w-[5rem] md:h-[5rem] lg:w-[7rem] lg:h-[7rem] transition-all duration-300"
           />
-          <h1 className="text-[clamp(3rem,6vw,6.5rem)] text-[#FFC105] sour-gummy-bold">
+          <h1 className="text-[2rem] sm:text-[3rem] md:text-[4rem] lg:text-[6.5rem] text-[#FFC105] sour-gummy-bold leading-tight">
             <span className="text-[#FFC105]">SPELLIN</span>
             <span className="text-[#795a3e]">-BEE</span>
           </h1>
@@ -100,11 +119,11 @@ function App() {
 
       <Toaster />
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 bg-[#3f3f3f]">
-        <AdBanner/>
+        {/* <AdBanner/> */}
         <Ads />
       </div>
     </div>
   );
 }
 
-export default App
+export default App;

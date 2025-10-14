@@ -24,8 +24,8 @@ function SignupPage() {
   }
 
   return (
-    <div className="w-full h-screen flex justify-center items-center p-4 text-[#3f3f3f] z-50 bg-black/50">
-      <div className="relative w-full max-w-md h-auto py-6 bg-[#f3f3f3] flex items-center justify-center rounded-2xl border-4 border-[#795a3e] shadow-lg">
+    <div className="fixed inset-0 flex justify-center items-center p-4 text-[#3f3f3f] z-50 bg-black/50">
+      <div className="w-full max-w-md h-auto py-6 bg-[#f3f3f3] flex items-center justify-center rounded-2xl border-4 border-[#795a3e] shadow-lg">
         <div className="w-full max-w-md">
           <div className="text-center mb-4">
             <h2 className="text-4xl quicksand-semi mb-2">Register</h2>
