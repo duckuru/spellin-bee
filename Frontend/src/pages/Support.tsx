@@ -1,6 +1,5 @@
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
 import { useNavigate } from "react-router";
 
 export default function Support() {
