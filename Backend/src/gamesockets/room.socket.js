@@ -66,16 +66,15 @@ async function saveState(room_id, state) {
 async function pickWordAndData(difficulty) {
   const wordList = wordsData[difficulty] || wordsData.easy;
   const word = wordList[Math.floor(Math.random() * wordList.length)];
-  let wordData = { word, definition: "", audio: "" };
+  let wordData = { word, definition: ""};
   try {
     const res = await axios.get(
-      `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(
+      `https://freedictionaryapi.com/api/v1/entries/en/${encodeURIComponent(
         word
       )}`
     );
-    wordData.definition =
-      res.data?.[0]?.meanings?.[0]?.definitions?.[0]?.definition || "";
-    wordData.audio = res.data?.[0]?.phonetics?.[0]?.audio || "";
+    wordData.definition = res.data?.entries?.[0].senses?.[0].definition || "";
+    console.log("Fetched definition for word:", word, ": ", wordData.definition);
   } catch (e) {
     console.warn("Dictionary API failed for word:", word);
   }

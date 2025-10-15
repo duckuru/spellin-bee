@@ -310,6 +310,11 @@ function GamePage() {
   }, [socket, authUser]);
 
   const isCurrentUserTurn = authUser?._id === currentTurnPlayerId;
+  useEffect(() => {
+    if (isCurrentUserTurn && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isCurrentUserTurn]);
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4 text-[#3f3f3f] z-50">
