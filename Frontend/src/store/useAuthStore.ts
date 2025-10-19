@@ -3,7 +3,8 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io, Socket } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
 
 interface User {
   _id: string;
@@ -16,6 +17,7 @@ interface UserData {
   rank: string;
   mmr: number;
   level: number;
+  hasAds: boolean;
 }
 
 interface SignupFormData {
@@ -65,7 +67,7 @@ interface AuthState {
   isCheckingAuth: boolean;
   isSigningUp: boolean;
   isLoggingIn: boolean;
-  isUpdatingProfileImage: boolean,
+  isUpdatingProfileImage: boolean;
   socket: Socket | null;
   onlineUsers: string[];
 
@@ -74,6 +76,7 @@ interface AuthState {
   signup: (data: SignupFormData) => void;
   login: (data: LoginFormData) => void;
   logout: () => void;
+  updateHasAds: () => Promise<void>;
   connectSocket: () => void;
   disconnectSocket: () => void;
 
@@ -96,7 +99,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isUpdatingProfileImage: false,
   socket: null,
   onlineUsers: [],
-
   myMatches: [],
   isLoadingMatches: false,
   myHistory: [],
@@ -125,12 +127,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isUpdatingProfileImage: true });
     try {
       const res = await axiosInstance.put("/auth/update-profile", data);
-      set({authUser: res.data})
-      toast.success("Profile update successfully")
-    } catch (error:any) {
+      set({ authUser: res.data });
+      toast.success("Profile update successfully");
+    } catch (error: any) {
       console.log("Error updating profile:", error);
       toast.error(error.response.data.message);
-    }finally {
+    } finally {
       set({ isUpdatingProfileImage: false });
     }
   },
@@ -174,7 +176,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
   // ✅ Logout clears auth state
   logout: async () => {
-
     try {
       await axiosInstance.post("/auth/logout");
       set({
@@ -182,12 +183,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         userData: null,
         isLoggedIn: false,
         isLoading: false,
-      });    
+      });
       toast.success("Logged Out Successfully!");
-      get().disconnectSocket(); 
-    } catch (error:any) {
+      get().disconnectSocket();
+    } catch (error: any) {
       toast.error(error.response.data.message);
       console.log("Logout Error: ", error);
+    }
+  },
+
+  // authStore.ts
+  updateHasAds: async () => {
+    try {
+      const res = await axiosInstance.put("/auth/has-ads", {
+        userId: get().authUser?._id,
+      });
+
+      // Update the store with the latest userData from backend
+      set((state) => ({
+        userData: {
+          ...state.userData,
+          ...res.data.userData,
+        },
+      }));
+
+      toast.success("Ads disabled successfully!");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to disable ads");
     }
   },
 
@@ -222,17 +244,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   connectSocket: () => {
-    const {authUser} = get();
+    const { authUser } = get();
 
     if (!authUser || get().socket?.connected) return;
 
     const socket = io(BASE_URL, {
-      withCredentials: true
+      withCredentials: true,
     });
 
-    socket.connect()
+    socket.connect();
 
-    set({socket})
+    set({ socket });
 
     //listen for online user event
 
@@ -242,8 +264,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   disconnectSocket: () => {
-    if(get().socket?.connected){
+    if (get().socket?.connected) {
       get().socket?.disconnect();
-    } 
+    }
   },
 }));

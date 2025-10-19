@@ -181,7 +181,7 @@ export const checkAuth = async (req, res) => {
       response
     });
   } catch (error) {
-    console.error("Error in /check:", error);
+    console.error("Error in check:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }

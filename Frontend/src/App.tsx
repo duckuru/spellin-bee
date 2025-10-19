@@ -118,7 +118,7 @@ function App() {
       </Routes>
 
       <Toaster />
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 bg-[#3f3f3f]">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50">
         {/* <AdBanner/> */}
         <Ads />
       </div>

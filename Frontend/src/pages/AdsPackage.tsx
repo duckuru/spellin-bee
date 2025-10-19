@@ -2,9 +2,11 @@ import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function AdsPackage() {
   const [cardNumber, setCardNumber] = useState("");
+  const { updateHasAds } = useAuthStore();
   const [expiry, setExpiry] = useState("");
   const navigate = useNavigate();
 
@@ -26,20 +28,22 @@ export default function AdsPackage() {
     setExpiry(value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!cardNumber || !expiry) {
-    alert("Please fill in all fields.");
-    return;
-  }
+    if (!cardNumber || !expiry) {
+      alert("Please fill in all fields.");
+      return;
+    }
 
-  // Simulate successful payment
-  localStorage.setItem("hasAds", "false");
-
-  alert("Payment successful! Ads have been disabled.");
-  navigate("/profile");
-  window.location.reload(); // Refresh to immediately remove ads
+    try {
+      await updateHasAds(); // call Zustand function
+      // alert("Payment successful! Ads have been disabled.");
+      navigate("/profile");
+    } catch (err) {
+      console.error(err);
+      // alert("Payment failed. Try again.");
+    }
 };
 
   const handleBack = () => {
@@ -48,7 +52,7 @@ export default function AdsPackage() {
 
 
   return (
-    <div className="w-full h-screen flex justify-center items-center p-4 bg-black/50 text-[#3f3f3f] z-50">
+    <div className="w-full inset-0 fixed flex justify-center items-center p-4 bg-black/50 text-[#3f3f3f] z-50">
       <div className="relative w-full max-w-4xl bg-[#f3f3f3] rounded-2xl border-4 border-[#795a3e] shadow-lg grid grid-cols-1 md:grid-cols-2 overflow-hidden">
         {/* LEFT: Order Summary */}
         <div className="p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#d0bfae]">

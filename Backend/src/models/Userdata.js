@@ -20,6 +20,10 @@ const userDataSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
+    hasAds: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

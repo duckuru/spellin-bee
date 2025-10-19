@@ -14,11 +14,11 @@
 [✅] = Ads sense
 [✅] = Change logo
 
-[❌?] = Responsive
+[✅] = Responsive
 
 [✅] = Deploy
-[❌] = Poster
-[❌] = Doc
-[❌] = Timeline
-[❌] = Slide
+[✅] = Poster
+[✅] = Doc
+[✅] = Timeline
+[✅] = Slide
 

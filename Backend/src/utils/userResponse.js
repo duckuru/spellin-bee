@@ -17,6 +17,7 @@ export const formatUserResponse = async (user) => {
       rank: userData?.rank ?? "Unknown",
       mmr: userData?.mmr ?? 0,
       level: userData?.level ?? 0,
+      hasAds: userData?.hasAds ?? true,
     },
   };
 };
