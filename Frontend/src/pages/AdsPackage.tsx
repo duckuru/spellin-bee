@@ -64,7 +64,7 @@ export default function AdsPackage() {
           >
             <FontAwesomeIcon icon={faChevronLeft} className="text-xl" />
           </button>
-            <h1 className="text-2xl font-bold">🪶 Ads-Free Package</h1>
+            <h1 className="text-2xl font-bold">Ads-Free Package</h1>
           </div>
             <p className="text-sm text-gray-600 mb-6">
               Enjoy an uninterrupted experience without banner ads forever.
